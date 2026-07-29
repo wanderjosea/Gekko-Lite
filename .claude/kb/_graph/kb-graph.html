@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PenA KB — Grafo de conocimiento</title>
+<style>
+  :root { color-scheme: dark; }
+  html,body { margin:0; height:100%; background:#05070d; overflow:hidden;
+              font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+  canvas { display:block; cursor:grab; }
+  #hud { position:fixed; top:14px; left:16px; color:#c9d6e6; font-size:12px;
+         line-height:1.7; text-shadow:0 0 6px #000; pointer-events:none; }
+  #hud b { color:#fff; font-size:14px; }
+  #legend { margin-top:8px; }
+  #legend span { display:inline-block; margin-right:12px; }
+  .dot { display:inline-block; width:9px; height:9px; border-radius:50%;
+         margin-right:5px; vertical-align:middle; }
+  #tip { position:fixed; pointer-events:none; padding:8px 10px; font-size:12px;
+         background:rgba(8,12,20,.94); border:1px solid #2a3a52; border-radius:8px;
+         color:#e6eefc; max-width:280px; display:none; box-shadow:0 6px 24px #000; }
+  #tip b { color:#fff; } #tip .tg { color:#7fb0ff; }
+  #hint { position:fixed; bottom:12px; right:16px; color:#54637a; font-size:11px; }
+</style></head><body>
+<canvas id="c"></canvas>
+<div id="hud">
+  <b>PenA · Knowledge Base</b><br>
+  27 nodos · 93 enlaces (82 wikilinks)
+  <div id="legend"></div>
+</div>
+<div id="tip"></div>
+<div id="hint">arrastra nodos · rueda = zoom · click = resaltar vecinos</div>
+<script>
+const G = {"nodes": [{"slug": "active-directory-attacks", "index_name": "active-directory-attacks", "title": "Active Directory Attacks", "category": "techniques", "summary": "BloodHound/cypher, DCSync, ACL abuse, AD CS ESC1, cross-forest, PAM trust", "tags": ["ad", "bloodhound", "dcsync", "acl", "adcs", "esc1", "kerberoast", "asrep", "cross-forest", "pam-trust"], "updated": "2026-07-01", "chars": 7238, "degree": 10}, {"slug": "ad-credential-looting", "index_name": "ad-credential-looting", "title": "AD Credential Looting — Quick Wins", "category": "techniques", "summary": "Quick-win creds: SMB null/guest shares, LDAP info/description attrs, hardcoded creds in .NET binaries (strings -e l)", "tags": ["ad", "smb", "null-session", "guest", "ldap", "info-attribute", "dotnet", "strings", "loot"], "updated": "2026-07-24", "chars": 3335, "degree": 7}, {"slug": "adversarial-evasion", "index_name": "adversarial-evasion", "title": "Adversarial Evasion (FGSM/PGD/MI-FGSM, JSMA/ElasticNet, GoodWords)", "category": "techniques", "summary": "GoodWords; FGSM/I-FGSM/PGD/MI-FGSM/DeepFool; JSMA/sparsity; badge/digit classifier pipeline", "tags": ["ml-security", "evasion", "adversarial-examples", "fgsm", "pgd", "jsma", "elasticnet", "goodwords", "owasp-ml01"], "updated": "2026-06-30", "chars": 8617, "degree": 4}, {"slug": "ai-defenses", "index_name": "ai-defenses", "title": "AI Defenses (guardrails / adversarial training / safety fine-tuning)", "category": "techniques", "summary": "Guardrails, adversarial training, safety fine-tuning (for report remediations)", "tags": ["defenses", "guardrails", "adversarial-training", "fgsm", "lora", "remediation", "llm-safety"], "updated": "2026-06-30", "chars": 4668, "degree": 6}, {"slug": "ai-privacy-attacks", "index_name": "ai-privacy-attacks", "title": "AI Privacy Attacks (MIA / Inversion / Extraction) + DP defenses", "category": "techniques", "summary": "Membership inference, model inversion/extraction; DP-SGD/PATE defenses", "tags": ["mia", "membership-inference", "model-inversion", "differential-privacy", "dp-sgd", "pate", "owasp-ml"], "updated": "2026-06-30", "chars": 5047, "degree": 5}, {"slug": "ai-redteam-foundations", "index_name": "ai-redteam-foundations", "title": "AI Red-Team Foundations (ML basics + threat model + workflow)", "category": "techniques", "summary": "ML/DL basics, OWASP ML/LLM Top 10, SAIF, GenAI attack surfaces", "tags": ["fundamentals", "ml-basics", "owasp-ml", "owasp-llm", "saif", "threat-model", "infosec-ml"], "updated": "2026-06-30", "chars": 4170, "degree": 6}, {"slug": "attacking-ai-llm", "index_name": "attacking-ai-llm", "title": "Attacking AI — App & System Layer (model theft, CVEs, MCP)", "category": "techniques", "summary": "App/system attack flow, AI-infra recon, model extraction, sponge DoS, CVEs, MCP abuse", "tags": ["llm", "model-extraction", "mcp", "torchserve", "mlflow", "ollama", "idor", "sqli", "dos"], "updated": "2026-06-30", "chars": 5524, "degree": 8}, {"slug": "bad-epoll-privesc", "index_name": "bad-epoll-privesc", "title": "Bad Epoll — kernel epoll UAF privesc (CVE-2026-46242)", "category": "techniques", "summary": "CVE-2026-46242 kernel epoll UAF (race cond.) → root, incl. Android; build/run de la PoC pública", "tags": ["linux", "kernel", "privesc", "race-condition", "uaf", "epoll", "android"], "updated": "2026-07-04", "chars": 5954, "degree": 4}, {"slug": "data-poisoning", "index_name": "data-poisoning", "title": "Data Poisoning & Model Integrity Attacks", "category": "techniques", "summary": "Label flipping, clean-label, trojan/backdoor, pickle RCE, online poisoning + defense", "tags": ["ml-security", "poisoning", "backdoor", "trojan", "pickle-rce", "steganography", "owasp-ml02"], "updated": "2026-06-30", "chars": 4879, "degree": 7}, {"slug": "llm-output-attacks", "index_name": "llm-output-attacks", "title": "LLM Output Attacks (Improper Output Handling, LLM05)", "category": "techniques", "summary": "LLM output → XSS/SQLi/RCE/Markdown-exfil/hallucinated-pkgs; payloads + oracle questions", "tags": ["llm", "llm05", "xss", "sqli", "rce", "exfiltration"], "updated": "2026-06-30", "chars": 2771, "degree": 4}, {"slug": "network-pivoting", "index_name": "network-pivoting", "title": "Network Pivoting (Chisel, Ligolo-ng, SSH)", "category": "techniques", "summary": "Chisel, Ligolo-ng, SSH tunneling, proxychains, subnet discovery", "tags": ["pivot", "chisel", "ligolo", "socks", "tunnel", "proxychains", "port-forward"], "updated": "2026-07-01", "chars": 4136, "degree": 5}, {"slug": "password-spray", "index_name": "password-spray", "title": "Password spray y credential reuse", "category": "techniques", "summary": "Spray + credential reuse, Kerberoast/AS-REP/PTH, lockout notes", "tags": ["password-spray", "netexec", "kerberoast", "pth", "ad", "credentials"], "updated": "2026-06-30", "chars": 3560, "degree": 8}, {"slug": "privilege-escalation", "index_name": "privilege-escalation", "title": "Escalación de privilegios (Linux + Windows)", "category": "techniques", "summary": "Linux + Windows/AD privesc chains, Node.js inspect, pillaging, real-world gotchas", "tags": ["privesc", "linux", "windows", "sudo", "suid", "ad", "tokens"], "updated": "2026-07-26", "chars": 5212, "degree": 11}, {"slug": "prompt-injection", "index_name": "prompt-injection", "title": "Prompt Injection & Jailbreaking", "category": "techniques", "summary": "Direct/indirect/jailbreak/leak; injection techniques; system-prompt-leak escalation", "tags": ["llm", "prompt-injection", "jailbreak", "system-prompt-leak"], "updated": "2026-06-30", "chars": 2949, "degree": 5}, {"slug": "rbcd-to-domain-admin", "index_name": "rbcd-to-domain-admin", "title": "RBCD to Domain Admin", "category": "techniques", "summary": "RBCD → DA: preconds, impacket addcomputer/rbcd/getST/secretsdump flow, verify + cleanup, Kerberos gotchas", "tags": ["ad", "rbcd", "delegation", "kerberos", "s4u", "impacket", "privesc", "domain-admin"], "updated": "2026-07-24", "chars": 3858, "degree": 11}, {"slug": "web-app-attacks", "index_name": "web-app-attacks", "title": "Web Application Attacks", "category": "techniques", "summary": "VHost fuzzing, SQLi, LFI, upload bypass, OFBiz/NextJS/OpenNMS CVEs, Docker creds", "tags": ["web", "sqli", "lfi", "upload", "vhost", "rce", "nextjs", "opennms", "cms", "ssrf", "oob", "collaborator"], "updated": "2026-07-15", "chars": 7681, "degree": 7}, {"slug": "windows-nssm-job-escape", "index_name": "windows-nssm-job-escape", "title": "Windows NSSM Job Object Escape (WMI process spawn)", "category": "techniques", "summary": "NSSM job object kills child processes on service restart — escape with wmic process call create; START /B does NOT work", "tags": ["windows", "nssm", "job-object", "wmi", "persistence", "shell", "meterpreter"], "updated": "2026-07-26", "chars": 2381, "degree": 4}, {"slug": "windows-sedebugprivilege-migrate", "index_name": "windows-sedebugprivilege-migrate", "title": "Windows SeDebugPrivilege → SYSTEM via Meterpreter Migrate", "category": "techniques", "summary": "SeDebugPrivilege (even Disabled) → migrate to winlogon.exe → SYSTEM; no getsystem or potato needed", "tags": ["windows", "privesc", "sedebug", "meterpreter", "system", "token", "privilege"], "updated": "2026-07-26", "chars": 1855, "degree": 6}, {"slug": "gtfobins-binaries", "index_name": "gtfobins-binaries", "title": "Binarios y herramientas (LOLbins, transfer, pivoting, cracking)", "category": "tools", "summary": "LOLbins: transfers, shells, pivoting, potatoes, AD enum, cracking", "tags": ["gtfobins", "lolbins", "transfer", "pivoting", "ligolo", "impacket", "cracking", "mimikatz"], "updated": "2026-06-30", "chars": 5279, "degree": 10}, {"slug": "medusa", "index_name": "medusa", "title": "MEDUSA (AI-first SAST scanner)", "category": "tools", "summary": "AI-first SAST scanner (pip): repo/MCP/AI-config scan, secrets, supply-chain CVEs; feeds code-auditor", "tags": ["medusa", "sast", "static-analysis", "ai-security", "mcp", "prompt-injection", "supply-chain", "secrets", "code-audit"], "updated": "2026-07-06", "chars": 3919, "degree": 5}, {"slug": "msfrpcd-api", "index_name": "msfrpcd-api", "title": "msfrpcd MessagePack RPC API", "category": "tools", "summary": "Automate meterpreter/msfconsole via HTTP+MessagePack API — start daemon, auth, console/session control, Python snippets", "tags": ["metasploit", "msfrpcd", "rpc", "msgpack", "automation", "meterpreter", "python"], "updated": "2026-07-26", "chars": 3231, "degree": 5}, {"slug": "netexec-crackmapexec", "index_name": "netexec-crackmapexec", "title": "NetExec / CrackMapExec cheatsheet", "category": "tools", "summary": "Full NXC/CME cheatsheet: spray, enum, secrets, modules, chisel", "tags": ["netexec", "crackmapexec", "nxc", "cme", "smb", "ldap", "ad", "spray", "secretsdump"], "updated": "2026-07-01", "chars": 6347, "degree": 10}, {"slug": "password-cracking", "index_name": "password-cracking", "title": "Password Cracking (Hashcat + identification)", "category": "tools", "summary": "Hashcat modes, hash identification, app hash locations, base64url decode", "tags": ["hashcat", "hash", "cracking", "hashid", "ntlm", "kerberos"], "updated": "2026-07-01", "chars": 3940, "degree": 8}, {"slug": "pena-toolbox", "index_name": "pena-toolbox", "title": "PenA toolbox (arsenal Kali dockerizado)", "category": "tools", "summary": "Default arsenal: Kali-headless + KB tools in one Docker image; hybrid local/live-target run; `make` wrapper", "tags": ["docker", "kali", "arsenal", "toolbox", "netexec", "impacket", "ligolo", "metasploit", "medusa", "hybrid"], "updated": "2026-07-25", "chars": 4842, "degree": 11}, {"slug": "service-enumeration", "index_name": "service-enumeration", "title": "Enumeración por servicio (recon ABC)", "category": "tools", "summary": "Command-by-command recon per port/service + internal apps", "tags": ["recon", "enumeration", "smb", "ldap", "http", "ftp", "kerberos", "nfs"], "updated": "2026-06-30", "chars": 5930, "degree": 10}, {"slug": "reverse-shells", "index_name": "reverse-shells", "title": "Reverse Shells + TTY Stabilization", "category": "payloads", "summary": "One-liners (bash/py/php/ps1/node), TTY stabilization, app-specific payloads", "tags": ["reverse-shell", "tty", "shell", "payload", "netcat", "bash"], "updated": "2026-07-01", "chars": 5227, "degree": 8}, {"slug": "bad-epoll-cve-2026-46242", "index_name": "bad-epoll-cve-2026-46242/", "title": "bad-epoll CVE-2026-46242 (vendored PoC)", "category": "payloads", "summary": "Vendored PoC + full build deps (libxdk, target_db.kxdb) for offline compile — see [[bad-epoll-privesc]]", "tags": [], "updated": "2026-07-04", "chars": 4181, "degree": 1}], "edges": [{"source": "active-directory-attacks", "target": "ad-credential-looting", "kind": "wikilink", "weight": 3.0}, {"source": "active-directory-attacks", "target": "gtfobins-binaries", "kind": "wikilink", "weight": 3.0}, {"source": "active-directory-attacks", "target": "netexec-crackmapexec", "kind": "wikilink", "weight": 3.0}, {"source": "active-directory-attacks", "target": "network-pivoting", "kind": "wikilink", "weight": 3.0}, {"source": "active-directory-attacks", "target": "password-cracking", "kind": "wikilink", "weight": 3.0}, {"source": "active-directory-attacks", "target": "password-spray", "kind": "wikilink", "weight": 3.0}, {"source": "active-directory-attacks", "target": "pena-toolbox", "kind": "wikilink", "weight": 3.0}, {"source": "active-directory-attacks", "target": "privilege-escalation", "kind": "wikilink", "weight": 3.0}, {"source": "active-directory-attacks", "target": "rbcd-to-domain-admin", "kind": "wikilink", "weight": 3.0}, {"source": "active-directory-attacks", "target": "service-enumeration", "kind": "wikilink", "weight": 3.0}, {"source": "ad-credential-looting", "target": "netexec-crackmapexec", "kind": "wikilink", "weight": 3.0}, {"source": "ad-credential-looting", "target": "password-spray", "kind": "wikilink", "weight": 3.0}, {"source": "ad-credential-looting", "target": "pena-toolbox", "kind": "wikilink", "weight": 3.0}, {"source": "ad-credential-looting", "target": "privilege-escalation", "kind": "tag", "weight": 1.0}, {"source": "ad-credential-looting", "target": "rbcd-to-domain-admin", "kind": "wikilink", "weight": 3.0}, {"source": "ad-credential-looting", "target": "service-enumeration", "kind": "wikilink", "weight": 3.0}, {"source": "adversarial-evasion", "target": "ai-defenses", "kind": "wikilink", "weight": 3.0}, {"source": "adversarial-evasion", "target": "ai-privacy-attacks", "kind": "wikilink", "weight": 3.0}, {"source": "adversarial-evasion", "target": "ai-redteam-foundations", "kind": "wikilink", "weight": 3.0}, {"source": "adversarial-evasion", "target": "data-poisoning", "kind": "wikilink", "weight": 3.0}, {"source": "ai-defenses", "target": "ai-privacy-attacks", "kind": "wikilink", "weight": 3.0}, {"source": "ai-defenses", "target": "ai-redteam-foundations", "kind": "wikilink", "weight": 3.0}, {"source": "ai-defenses", "target": "data-poisoning", "kind": "wikilink", "weight": 3.0}, {"source": "ai-defenses", "target": "llm-output-attacks", "kind": "wikilink", "weight": 3.0}, {"source": "ai-defenses", "target": "prompt-injection", "kind": "wikilink", "weight": 3.0}, {"source": "ai-privacy-attacks", "target": "ai-redteam-foundations", "kind": "wikilink", "weight": 3.0}, {"source": "ai-privacy-attacks", "target": "attacking-ai-llm", "kind": "wikilink", "weight": 3.0}, {"source": "ai-privacy-attacks", "target": "data-poisoning", "kind": "wikilink", "weight": 3.0}, {"source": "ai-redteam-foundations", "target": "attacking-ai-llm", "kind": "wikilink", "weight": 3.0}, {"source": "ai-redteam-foundations", "target": "data-poisoning", "kind": "wikilink", "weight": 3.0}, {"source": "ai-redteam-foundations", "target": "prompt-injection", "kind": "wikilink", "weight": 3.0}, {"source": "attacking-ai-llm", "target": "data-poisoning", "kind": "wikilink", "weight": 3.0}, {"source": "attacking-ai-llm", "target": "llm-output-attacks", "kind": "wikilink", "weight": 3.0}, {"source": "attacking-ai-llm", "target": "medusa", "kind": "wikilink", "weight": 3.0}, {"source": "attacking-ai-llm", "target": "prompt-injection", "kind": "wikilink", "weight": 3.0}, {"source": "attacking-ai-llm", "target": "reverse-shells", "kind": "wikilink", "weight": 3.0}, {"source": "attacking-ai-llm", "target": "web-app-attacks", "kind": "wikilink", "weight": 3.0}, {"source": "bad-epoll-cve-2026-46242", "target": "bad-epoll-privesc", "kind": "wikilink", "weight": 3.0}, {"source": "bad-epoll-privesc", "target": "privilege-escalation", "kind": "wikilink", "weight": 3.0}, {"source": "bad-epoll-privesc", "target": "rbcd-to-domain-admin", "kind": "tag", "weight": 1.0}, {"source": "bad-epoll-privesc", "target": "windows-sedebugprivilege-migrate", "kind": "tag", "weight": 1.0}, {"source": "data-poisoning", "target": "medusa", "kind": "wikilink", "weight": 3.0}, {"source": "data-poisoning", "target": "reverse-shells", "kind": "wikilink", "weight": 3.0}, {"source": "gtfobins-binaries", "target": "netexec-crackmapexec", "kind": "wikilink", "weight": 3.0}, {"source": "gtfobins-binaries", "target": "network-pivoting", "kind": "wikilink", "weight": 3.0}, {"source": "gtfobins-binaries", "target": "password-cracking", "kind": "wikilink", "weight": 3.0}, {"source": "gtfobins-binaries", "target": "pena-toolbox", "kind": "wikilink", "weight": 3.0}, {"source": "gtfobins-binaries", "target": "privilege-escalation", "kind": "wikilink", "weight": 3.0}, {"source": "gtfobins-binaries", "target": "rbcd-to-domain-admin", "kind": "tag", "weight": 1.0}, {"source": "gtfobins-binaries", "target": "reverse-shells", "kind": "wikilink", "weight": 3.0}, {"source": "gtfobins-binaries", "target": "web-app-attacks", "kind": "wikilink", "weight": 3.0}, {"source": "gtfobins-binaries", "target": "windows-sedebugprivilege-migrate", "kind": "wikilink", "weight": 3.0}, {"source": "llm-output-attacks", "target": "prompt-injection", "kind": "wikilink", "weight": 3.0}, {"source": "llm-output-attacks", "target": "web-app-attacks", "kind": "wikilink", "weight": 3.0}, {"source": "medusa", "target": "pena-toolbox", "kind": "wikilink", "weight": 3.0}, {"source": "medusa", "target": "prompt-injection", "kind": "wikilink", "weight": 3.0}, {"source": "medusa", "target": "web-app-attacks", "kind": "wikilink", "weight": 3.0}, {"source": "msfrpcd-api", "target": "pena-toolbox", "kind": "tag", "weight": 1.0}, {"source": "msfrpcd-api", "target": "privilege-escalation", "kind": "wikilink", "weight": 3.0}, {"source": "msfrpcd-api", "target": "reverse-shells", "kind": "wikilink", "weight": 3.0}, {"source": "msfrpcd-api", "target": "windows-nssm-job-escape", "kind": "wikilink", "weight": 3.0}, {"source": "msfrpcd-api", "target": "windows-sedebugprivilege-migrate", "kind": "wikilink", "weight": 3.0}, {"source": "netexec-crackmapexec", "target": "network-pivoting", "kind": "wikilink", "weight": 3.0}, {"source": "netexec-crackmapexec", "target": "password-cracking", "kind": "wikilink", "weight": 3.0}, {"source": "netexec-crackmapexec", "target": "password-spray", "kind": "wikilink", "weight": 3.0}, {"source": "netexec-crackmapexec", "target": "pena-toolbox", "kind": "wikilink", "weight": 3.0}, {"source": "netexec-crackmapexec", "target": "privilege-escalation", "kind": "tag", "weight": 1.0}, {"source": "netexec-crackmapexec", "target": "rbcd-to-domain-admin", "kind": "wikilink", "weight": 3.0}, {"source": "netexec-crackmapexec", "target": "service-enumeration", "kind": "wikilink", "weight": 3.0}, {"source": "network-pivoting", "target": "pena-toolbox", "kind": "wikilink", "weight": 3.0}, {"source": "network-pivoting", "target": "service-enumeration", "kind": "wikilink", "weight": 3.0}, {"source": "password-cracking", "target": "password-spray", "kind": "wikilink", "weight": 3.0}, {"source": "password-cracking", "target": "pena-toolbox", "kind": "wikilink", "weight": 3.0}, {"source": "password-cracking", "target": "rbcd-to-domain-admin", "kind": "wikilink", "weight": 3.0}, {"source": "password-cracking", "target": "service-enumeration", "kind": "tag", "weight": 1.0}, {"source": "password-cracking", "target": "web-app-attacks", "kind": "wikilink", "weight": 3.0}, {"source": "password-spray", "target": "pena-toolbox", "kind": "wikilink", "weight": 3.0}, {"source": "password-spray", "target": "privilege-escalation", "kind": "tag", "weight": 1.0}, {"source": "password-spray", "target": "rbcd-to-domain-admin", "kind": "tag", "weight": 1.0}, {"source": "password-spray", "target": "service-enumeration", "kind": "wikilink", "weight": 3.0}, {"source": "pena-toolbox", "target": "rbcd-to-domain-admin", "kind": "wikilink", "weight": 3.0}, {"source": "pena-toolbox", "target": "service-enumeration", "kind": "wikilink", "weight": 3.0}, {"source": "privilege-escalation", "target": "rbcd-to-domain-admin", "kind": "wikilink", "weight": 3.0}, {"source": "privilege-escalation", "target": "reverse-shells", "kind": "wikilink", "weight": 3.0}, {"source": "privilege-escalation", "target": "windows-nssm-job-escape", "kind": "wikilink", "weight": 3.0}, {"source": "privilege-escalation", "target": "windows-sedebugprivilege-migrate", "kind": "wikilink", "weight": 3.0}, {"source": "rbcd-to-domain-admin", "target": "service-enumeration", "kind": "tag", "weight": 1.0}, {"source": "rbcd-to-domain-admin", "target": "windows-sedebugprivilege-migrate", "kind": "tag", "weight": 1.0}, {"source": "reverse-shells", "target": "service-enumeration", "kind": "wikilink", "weight": 3.0}, {"source": "reverse-shells", "target": "web-app-attacks", "kind": "wikilink", "weight": 3.0}, {"source": "reverse-shells", "target": "windows-nssm-job-escape", "kind": "wikilink", "weight": 3.0}, {"source": "service-enumeration", "target": "web-app-attacks", "kind": "wikilink", "weight": 3.0}, {"source": "windows-nssm-job-escape", "target": "windows-sedebugprivilege-migrate", "kind": "wikilink", "weight": 3.0}], "colors": {"techniques": "#ff6b6b", "tools": "#4dd4c0", "platforms": "#ffd166", "payloads": "#a78bfa", "unknown": "#8899aa"}};
+const cv = document.getElementById('c'), ctx = cv.getContext('2d');
+const tip = document.getElementById('tip');
+let W, H, DPR;
+function resize(){ DPR=devicePixelRatio||1; W=innerWidth; H=innerHeight;
+  cv.width=W*DPR; cv.height=H*DPR; cv.style.width=W+'px'; cv.style.height=H+'px';
+  ctx.setTransform(DPR,0,0,DPR,0,0); }
+addEventListener('resize', resize); resize();
+
+// legend
+const leg = document.getElementById('legend');
+for (const [k,v] of Object.entries(G.colors)) if(k!=='unknown')
+  leg.insertAdjacentHTML('beforeend',
+    `<span><i class="dot" style="background:${v}"></i>${k}</span>`);
+
+// build node/edge objects
+const nodes = G.nodes.map(n => ({...n,
+  x: W/2 + (Math.random()-.5)*300, y: H/2 + (Math.random()-.5)*300,
+  vx:0, vy:0, r: 4 + Math.sqrt(n.degree||0)*3 }));
+const idx = Object.fromEntries(nodes.map((n,i)=>[n.slug,i]));
+const edges = G.edges.map(e => ({...e, s: idx[e.source], t: idx[e.target]}))
+                     .filter(e => e.s!=null && e.t!=null);
+// adjacency for highlight
+const adj = nodes.map(()=>new Set());
+edges.forEach((e,i)=>{ adj[e.s].add(e.t); adj[e.t].add(e.s); });
+
+// view transform
+let scale=1, ox=0, oy=0, sel=null, drag=null, pan=null;
+const cx=()=>W/2, cy=()=>H/2;
+function toScreen(n){ return [ (n.x-cx())*scale+cx()+ox, (n.y-cy())*scale+cy()+oy ]; }
+function toWorld(px,py){ return [ (px-cx()-ox)/scale+cx(), (py-cy()-oy)/scale+cy() ]; }
+
+// force simulation (Fruchterman-Reingold-ish, no deps)
+const K = 130;                       // ideal spring length
+function step(){
+  for (const n of nodes){ n.fx=0; n.fy=0; }
+  // repulsion (O(n^2) — fine for a KB of dozens of notes)
+  for (let i=0;i<nodes.length;i++) for (let j=i+1;j<nodes.length;j++){
+    const a=nodes[i], b=nodes[j];
+    let dx=a.x-b.x, dy=a.y-b.y, d2=dx*dx+dy*dy+.01, d=Math.sqrt(d2);
+    const f = 5200/d2;
+    dx/=d; dy/=d; a.fx+=dx*f; a.fy+=dy*f; b.fx-=dx*f; b.fy-=dy*f;
+  }
+  // spring attraction along edges
+  for (const e of edges){
+    const a=nodes[e.s], b=nodes[e.t];
+    let dx=b.x-a.x, dy=b.y-a.y, d=Math.hypot(dx,dy)+.01;
+    const rest = e.kind==='wikilink'? K*0.7 : K;
+    const f = (d-rest) * (e.kind==='wikilink'? 0.02 : 0.006) * Math.min(e.weight,4);
+    dx/=d; dy/=d; a.fx+=dx*f; a.fy+=dy*f; b.fx-=dx*f; b.fy-=dy*f;
+  }
+  // gravity to center + integrate
+  for (const n of nodes){
+    if (n===drag) continue;
+    n.fx += (cx()-n.x)*0.002; n.fy += (cy()-n.y)*0.002;
+    n.vx=(n.vx+n.fx)*0.85; n.vy=(n.vy+n.fy)*0.85;
+    n.x+=n.vx; n.y+=n.vy;
+  }
+}
+
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  ctx.lineCap='round';
+  // edges
+  for (const e of edges){
+    const a=nodes[e.s], b=nodes[e.t];
+    const [ax,ay]=toScreen(a), [bx,by]=toScreen(b);
+    const hot = sel!=null && (e.s===sel||e.t===sel);
+    const dim = sel!=null && !hot;
+    ctx.globalAlpha = dim?0.05 : (e.kind==='wikilink'?0.55:0.18);
+    ctx.strokeStyle = e.kind==='wikilink' ? '#7fb0ff'
+                     : mix(G.colors[a.category], G.colors[b.category]);
+    ctx.lineWidth = (e.kind==='wikilink'?1.6:0.8) * Math.min(e.weight,3) * (hot?1.8:1);
+    ctx.beginPath(); ctx.moveTo(ax,ay); ctx.lineTo(bx,by); ctx.stroke();
+  }
+  ctx.globalAlpha=1;
+  // nodes
+  for (let i=0;i<nodes.length;i++){
+    const n=nodes[i], [x,y]=toScreen(n), r=n.r*Math.max(scale,.6);
+    const hot = sel==null || i===sel || adj[sel].has(i);
+    const col = G.colors[n.category]||G.colors.unknown;
+    ctx.globalAlpha = hot?1:0.15;
+    // glow
+    const g=ctx.createRadialGradient(x,y,0,x,y,r*3);
+    g.addColorStop(0,col+'cc'); g.addColorStop(1,col+'00');
+    ctx.fillStyle=g; ctx.beginPath(); ctx.arc(x,y,r*3,0,7); ctx.fill();
+    // core
+    ctx.fillStyle=col; ctx.beginPath(); ctx.arc(x,y,r,0,7); ctx.fill();
+    ctx.strokeStyle='#0009'; ctx.lineWidth=1; ctx.stroke();
+    // label (when zoomed in, hub, or selected/neighbor)
+    if ((scale>0.75 || n.degree>=4 || (sel!=null&&hot))){
+      ctx.globalAlpha = hot?0.95:0.2;
+      ctx.fillStyle='#dfe8f6'; ctx.font=`${Math.max(10,11*Math.min(scale,1.4))}px ui-monospace`;
+      ctx.textAlign='center';
+      ctx.fillText(n.slug, x, y - r - 4);
+    }
+  }
+  ctx.globalAlpha=1;
+}
+function mix(a,b){ // average two #rrggbb
+  const p=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16));
+  const [r1,g1,b1]=p(a),[r2,g2,b2]=p(b);
+  const h=v=>('0'+Math.round(v).toString(16)).slice(-2);
+  return '#'+h((r1+r2)/2)+h((g1+g2)/2)+h((b1+b2)/2);
+}
+let cool=0;
+function loop(){ if(cool<600||drag){ step(); cool++; } draw(); requestAnimationFrame(loop); }
+loop();
+
+// ── interaction ────────────────────────────────────────────────────────
+function pick(px,py){
+  const [wx,wy]=toWorld(px,py); let best=null,bd=1e9;
+  for(let i=0;i<nodes.length;i++){ const n=nodes[i];
+    const d=Math.hypot(n.x-wx,n.y-wy); if(d<bd&&d<n.r+6){bd=d;best=i;} }
+  return best;
+}
+cv.addEventListener('mousedown',e=>{
+  const i=pick(e.clientX,e.clientY);
+  if(i!=null){ drag=nodes[i]; sel=i; cool=0; cv.style.cursor='grabbing'; }
+  else { pan={x:e.clientX,y:e.clientY,ox,oy}; sel=null; }
+});
+addEventListener('mousemove',e=>{
+  if(drag){ const [wx,wy]=toWorld(e.clientX,e.clientY); drag.x=wx; drag.y=wy; drag.vx=drag.vy=0; }
+  else if(pan){ ox=pan.ox+(e.clientX-pan.x); oy=pan.oy+(e.clientY-pan.y); }
+  else { // hover tooltip
+    const i=pick(e.clientX,e.clientY);
+    if(i!=null){ const n=nodes[i];
+      tip.style.display='block'; tip.style.left=(e.clientX+14)+'px'; tip.style.top=(e.clientY+14)+'px';
+      tip.innerHTML=`<b>${n.title}</b><br><span style="color:${G.colors[n.category]}">${n.category}</span>`
+        +` · ${n.degree} enlaces`+(n.updated?` · ${n.updated}`:'')
+        +(n.tags.length?`<br><span class="tg">${n.tags.slice(0,8).join(' · ')}</span>`:'');
+    } else tip.style.display='none';
+  }
+});
+addEventListener('mouseup',()=>{ drag=null; pan=null; cv.style.cursor='grab'; });
+cv.addEventListener('wheel',e=>{ e.preventDefault();
+  const f=Math.exp(-e.deltaY*0.0012); scale=Math.min(4,Math.max(.25,scale*f));
+},{passive:false});
+</script></body></html>

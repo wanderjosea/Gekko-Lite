@@ -1,0 +1,24 @@
+# Raw course material — distilled into .claude/kb/ (agent-consumable).
+# Kept out of the repo on purpose.
+REDAI/
+
+# Local AI-security labs & engagement work — never published.
+labs/
+
+# Agent scratch memory / runtime state — ephemeral, not repo content.
+.claude/agent-memory/
+.claude/scheduled_tasks.lock
+.claude/settings.local.json
+
+# VPN configs are PII / session secrets — never commit
+*.ovpn
+
+# Engagement working dirs hold live loot/creds/PII — never commit
+engagements/
+
+# Deliverables & content drafts are built from engagement findings — never commit
+reports/
+content/
+
+# Dual-use kernel exploit + vendored research — kept local, not published
+.claude/kb/payloads/bad-epoll-cve-2026-46242/

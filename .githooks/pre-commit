@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+# PenA pre-commit guard — mechanically enforces .claude/rules/scope.md:
+#   1. nothing under engagements/ (live loot/creds/PII) ever gets committed
+#   2. no *.ovpn (session secrets)
+#   3. no secrets in staged content (gitleaks if present, regex fallback otherwise)
+# Install once:  git config core.hooksPath .githooks
+set -euo pipefail
+
+fail() { echo "✗ pre-commit blocked: $1" >&2; exit 1; }
+
+# Added/modified staged paths (deletions are fine — untracking engagements is OK).
+mapfile -t staged < <(git diff --cached --name-only --diff-filter=AM)
+
+for f in "${staged[@]}"; do
+  case "$f" in
+    engagements/*) fail "engagements/ is off-limits ($f). It holds live loot — keep it out of git." ;;
+    *.ovpn)        fail "VPN config staged ($f). .ovpn are session secrets — never commit." ;;
+  esac
+done
+
+[ ${#staged[@]} -eq 0 ] && exit 0
+
+# Secret scan on staged content — regex ALWAYS (catches gitleaks blind spots like
+# some key headers), gitleaks additionally when available (entropy + hundreds of rules).
+pat='gh[pousr]_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{30,}|AKIA[0-9A-Z]{16}|-----BEGIN [A-Z ]*PRIVATE KEY-----|xox[baprs]-[0-9A-Za-z-]{10,}|sk-[A-Za-z0-9]{20,}'
+if git diff --cached --no-color -U0 | grep -E "^\+" | grep -Eq "$pat"; then
+  fail "possible secret in staged changes (pattern match). Remove it, then re-commit."
+fi
+
+if command -v gitleaks >/dev/null 2>&1; then
+  gitleaks git --staged --no-banner --redact \
+    || fail "gitleaks found a secret in staged changes (see above). Remove it, then re-commit."
+fi
+exit 0
