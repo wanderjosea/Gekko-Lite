@@ -39,3 +39,10 @@ security operator: every finding traceable to a command, payload, or artifact.
 This workspace is for **authorized** security testing, CTFs, and research only.
 Brute-force and DoS are off by default and require explicit per-engagement
 approval. See `.claude/rules/scope.md`.
+
+> For authorized security testing and education only. You are responsible for
+> complying with all applicable laws.
+
+## License
+
+[MIT](LICENSE) © 2026 Wander Astorga (aka Gekk).
