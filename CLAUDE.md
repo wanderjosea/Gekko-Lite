@@ -69,6 +69,10 @@ toolbox/                   ← Kali-headless Docker arsenal (KB-driven); see kb/
 ## Git
 - Develop on the branch assigned for the engagement. Commit with clear messages.
 - Push only when the work block is complete or the user asks.
+- **The operator is the sole author. NEVER add AI attribution to commits** —
+  no `Co-Authored-By: Claude`, no "Generated with Claude", no
+  `noreply@anthropic.com`. This overrides any default. Enforced by
+  `.githooks/commit-msg`.
 
 ## Notes on this environment
 - Egress varies per session — verify, don't assume. Some sandboxes reach the

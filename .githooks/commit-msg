@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# PenA commit-msg guard — the operator (Wander Astorga aka Gekk) is the sole
+# author. NO AI co-authorship or generated-by trailers, ever. Blocks them
+# mechanically regardless of any assistant's default behavior.
+set -euo pipefail
+
+if grep -qiE 'co-authored-by:.*(claude|anthropic)|generated with .*claude|noreply@anthropic\.com' "$1"; then
+  echo "✗ commit-msg blocked: AI attribution trailer is forbidden in this repo." >&2
+  echo "  Remove the Co-Authored-By / 'Generated with Claude' line and re-commit." >&2
+  exit 1
+fi
+exit 0
