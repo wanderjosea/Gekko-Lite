@@ -25,7 +25,7 @@ finding-verifier's verdict drives `set`; report-writer `render`s the confirmed.
 # only if an engagement ever needs a full audit trail of who flipped what, when.
 """
 from __future__ import annotations
-import argparse, json, sys
+import argparse, json, re, sys
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -58,9 +58,9 @@ def _save(ledger: Path, rows: list[dict]) -> None:
 
 
 def _next_id(rows: list[dict]) -> str:
-    n = 1 + max((int(r["id"].split("-")[1]) for r in rows
-                 if str(r.get("id", "")).startswith("F-")), default=0)
-    return f"F-{n:04d}"
+    nums = [int(m.group(1)) for r in rows
+            if (m := re.fullmatch(r"F-(\d+)", str(r.get("id", ""))))]
+    return f"F-{max(nums, default=0) + 1:04d}"
 
 
 def cmd_add(a) -> None:
@@ -86,17 +86,17 @@ def cmd_add(a) -> None:
 def cmd_set(a) -> None:
     ledger = Path(a.ledger)
     rows = _load(ledger)
-    for r in rows:
-        if r.get("id") == a.id:
-            if a.status:
-                r["status"] = a.status
-            if a.artifact is not None:
-                r.setdefault("evidence", {})["artifact"] = a.artifact
-            r["updated"] = _now()
-            _save(ledger, rows)
-            print(f"{a.id} -> {r['status']}")
-            return
-    sys.exit(f"no finding {a.id} in {ledger}")
+    hits = [r for r in rows if r.get("id") == a.id]
+    if len(hits) != 1:
+        sys.exit(f"expected exactly one finding {a.id} in {ledger}, found {len(hits)}")
+    r = hits[0]
+    if a.status:
+        r["status"] = a.status
+    if a.artifact is not None:
+        r.setdefault("evidence", {})["artifact"] = a.artifact
+    r["updated"] = _now()
+    _save(ledger, rows)
+    print(f"{a.id} -> {r.get('status')}")
 
 
 def cmd_list(a) -> None:
@@ -104,7 +104,27 @@ def cmd_list(a) -> None:
     if a.status:
         rows = [r for r in rows if r.get("status") == a.status]
     for r in rows:
-        print(f"{r['id']}  [{r['severity']:>8}]  {r['status']:<10}  {r['title']}")
+        print(f"{r.get('id','?'):<8}  [{r.get('severity','?'):>8}]  "
+              f"{r.get('status','?'):<10}  {r.get('title','(no title)')}")
+
+
+def _fence(text: str) -> str:
+    """A backtick fence longer than any run inside `text`, so an evidence payload
+    (which may be untrusted target output) cannot break out of its code block."""
+    longest = run = 0
+    for ch in text:
+        run = run + 1 if ch == "`" else 0
+        longest = max(longest, run)
+    return "`" * max(3, longest + 1)
+
+
+def _field(label: str, value: str) -> None:
+    # inline code normally; if the value carries backticks/newlines, fence it wide
+    if "`" in value or "\n" in value:
+        f = _fence(value)
+        print(f"- **{label}:**\n\n{f}\n{value}\n{f}")
+    else:
+        print(f"- **{label}:** `{value}`")
 
 
 def cmd_render(a) -> None:
@@ -118,21 +138,21 @@ def cmd_render(a) -> None:
         print("_No confirmed findings._")
         return
     for r in rows:
-        ev = r.get("evidence", {})
-        print(f"## {r['id']} — {r['title']}")
-        print(f"- **Severity:** {r['severity']} · **Status:** {r['status']} · "
-              f"**Target:** {r['target']}")
+        ev = r.get("evidence", {}) or {}
+        print(f"## {r.get('id','?')} — {r.get('title','(no title)')}")
+        print(f"- **Severity:** {r.get('severity','?')} · "
+              f"**Status:** {r.get('status','?')} · **Target:** {r.get('target','?')}")
         if ev.get("command"):
-            print(f"- **Command:** `{ev['command']}`")
+            _field("Command", ev["command"])
         if ev.get("artifact"):
-            print(f"- **Artifact:** `{ev['artifact']}`")
+            _field("Artifact", ev["artifact"])
         if ev.get("output"):
-            print("- **Evidence:**\n\n  ```\n  " +
-                  ev["output"].replace("\n", "\n  ") + "\n  ```")
+            f = _fence(ev["output"])
+            print(f"- **Evidence:**\n\n{f}\n{ev['output']}\n{f}")
         if r.get("repro"):
             print("- **Repro:**")
-            for step in r["repro"]:
-                print(f"  1. {step}")
+            for i, step in enumerate(r["repro"], 1):
+                print(f"  {i}. {step}")
         if r.get("kb"):
             print(f"- **KB:** {', '.join(r['kb'])}")
         print()
@@ -171,6 +191,36 @@ def cmd_selftest(_a) -> None:
         raise AssertionError("corrupt line should have exited")
     except SystemExit:
         pass
+
+    # resilience: partial / hand-edited rows must not crash list or render
+    _save(led, [{"id": "F-0001", "title": "x", "severity": "high",
+                 "status": "confirmed", "target": "t", "evidence": {}},
+                {"id": "F-0099"}])
+    with contextlib.redirect_stdout(io.StringIO()):
+        cmd_list(ns(ledger=str(led), status=None))
+        cmd_render(ns(ledger=str(led), all=True))
+
+    # a duplicate id must make `set` refuse rather than flip the wrong finding
+    _save(led, [{"id": "F-0001", "status": "hypothesis"},
+                {"id": "F-0001", "status": "hypothesis"}])
+    try:
+        cmd_set(ns(ledger=str(led), id="F-0001", status="confirmed", artifact=None))
+        raise AssertionError("duplicate-id set should have exited")
+    except SystemExit:
+        pass
+
+    # id minting survives non-numeric F- ids in the ledger
+    assert _next_id([{"id": "F-"}, {"id": "F-x"}, {"id": "F-0007"}]) == "F-0008"
+
+    # untrusted output with a triple-backtick can't break out of the fence
+    _save(led, [{"id": "F-0001", "title": "t", "severity": "high",
+                 "status": "confirmed", "target": "t",
+                 "evidence": {"output": "```\n# not a heading\n```"}}])
+    buf = io.StringIO()
+    with contextlib.redirect_stdout(buf):
+        cmd_render(ns(ledger=str(led), all=False))
+    assert "````" in buf.getvalue()  # fence widened past the payload's backticks
+
     print("selftest OK")
 
 

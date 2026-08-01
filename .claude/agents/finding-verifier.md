@@ -40,8 +40,9 @@ basis:   <what the raw evidence actually supports>
 break:   <the strongest counter-explanation you found, and whether it holds>
 need:    <if inconclusive: the one check that would settle it>
 ```
-The main session flips the ledger from your verdict:
-`.claude/tools/findings.py set --ledger <path> --id <id> --status <verdict>`.
+The main session flips the ledger from your verdict — an `inconclusive` verdict
+leaves the finding as `hypothesis` (do not `set` it, it needs more work):
+`.claude/tools/findings.py set --ledger <path> --id <id> --status confirmed|refuted`.
 
 ## Constraints
 - Read-only: never mutate evidence or touch an out-of-scope/live target.
