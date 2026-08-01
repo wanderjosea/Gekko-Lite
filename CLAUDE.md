@@ -40,6 +40,7 @@ CLAUDE.md                  ← this contract
 ├── agents/                ← subagents (see roster below)
 ├── rules/                 ← modular rules (scope/ROE, style)
 ├── skills/                ← on-demand procedures (pentest-cycle, engagement-init, toolbox-up)
+├── tools/                 ← repo-internal helpers (findings.py — the findings ledger)
 └── kb/                    ← knowledge base: curated cheatsheets & lessons for agents
 engagements/               ← active engagement working dirs (gitignored, never published)
 labs/                      ← local AI-security labs (gitignored, never published)
@@ -51,6 +52,8 @@ toolbox/                   ← Kali-headless Docker arsenal (KB-driven); see kb/
 |---|---|---|---|
 | `knowledge-curator` | Turn raw/old docs into KB cheatsheets under `.claude/kb/` | file ops | yes (only `.claude/kb/`) |
 | `finding-analyzer` | Digest verbose tool/recon output → prioritized findings | read-only | no |
+| `finding-verifier` | Adversarially refute a finding before it ships (2nd signal) | read-only | no |
+| `exploit-developer` | Write/adapt offensive PoC code as an auditable artifact (builds, never runs vs target) | file ops + bash | yes (engagements/) |
 | `report-writer` | Build engagement deliverables (report + scripts + ZIP) | file ops + bash | yes (reports/) |
 | `code-auditor` | Critical read-only security review of code | read-only | no |
 | `content-strategist` | Judge if work is worth content + draft posts/threads | file ops | yes (only `content/`) |
@@ -61,6 +64,17 @@ toolbox/                   ← Kali-headless Docker arsenal (KB-driven); see kb/
 - KB entries are written **for agents to consume**: terse, skimmable, command-first.
 - To add knowledge: hand a source (file path, URL, or pasted text) to
   `@agent-knowledge-curator` and it will normalize + dedupe + index it.
+
+## Findings ledger (`.claude/tools/findings.py`)
+- One append `findings.jsonl` per engagement is the auditable spine: every finding
+  ties to the command/artifact that proves it. The report is a **projection** of it
+  (`render`), never retyped by hand.
+- Flow: `finding-analyzer`/`exploit-developer` `add` a **hypothesis** →
+  `finding-verifier` tries to refute it → main session `set`s the status to
+  `confirmed`/`refuted` → `report-writer` `render`s only the confirmed.
+- Nothing enters a deliverable as `confirmed` on a single signal — corroboration
+  is the bar (`.claude/rules/style.md`). `--artifact` holds a **path**; never
+  inline secrets. The ledger lives under `engagements/` → gitignored, never published.
 
 ## Engagement scope / rules of engagement
 - See `.claude/rules/scope.md`. Only act inside the authorized scope. Out-of-scope

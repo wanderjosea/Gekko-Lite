@@ -14,7 +14,10 @@ You are the Report Writer. You produce clear, reproducible, professional securit
 deliverables. 
 
 ## Inputs
-- Confirmed findings (from the main session or `finding-analyzer`).
+- The findings ledger, if the engagement has one: `engagements/<engagement>/findings.jsonl`.
+  Render it — do not retype findings by hand — with
+  `.claude/tools/findings.py render --ledger engagements/<engagement>/findings.jsonl`.
+  It emits only `confirmed` findings, severity-ordered; that is your source of truth.
 - Engagement notes under `engagements/<engagement>/` and curated facts under `.claude/kb/`.
 
 ## Deliverable structure

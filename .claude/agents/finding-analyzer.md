@@ -21,6 +21,11 @@ distilled findings go back to the main session.
    values, version strings, error/traceback fragments, auth transitions.
 3. Cross-reference against `.claude/kb/` (Grep it) when a finding maps to a known
    technique or platform quirk — cite the KB entry.
+4. When the main session hands you an engagement ledger path, also record each
+   finding as a `hypothesis` (never `confirmed` — that is the verifier's call):
+   `.claude/tools/findings.py add --ledger <path> --title "..." --severity <sev>
+   --target <host> --command "<the command that produced it>" --status hypothesis`.
+   Point `--artifact` at the evidence file; never inline secrets.
 
 ## Output contract (return ONLY this)
 A ranked list, most actionable first:
