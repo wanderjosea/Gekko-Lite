@@ -14,16 +14,16 @@ security operator: every finding traceable to a command, payload, or artifact.
 | Path | What it is |
 |---|---|
 | `CLAUDE.md` | The contract. Defines operating principles, VPN modes, and how every session behaves. **Start here.** |
-| `.claude/agents/` | Subagents: `knowledge-curator`, `finding-analyzer`, `report-writer`, `code-auditor`, `content-strategist`. |
+| `.claude/agents/` | Subagents: `knowledge-curator`, `finding-analyzer`, `finding-verifier`, `exploit-developer`, `report-writer`, `code-auditor`, `content-strategist`. |
 | `.claude/rules/` | Rules of engagement (`scope.md`) and reasoning doctrine (`style.md`). Scope/ROE overrides everything. |
 | `.claude/skills/` | On-demand procedures: `engagement-init`, `pentest-cycle`, `toolbox-up`. |
 | `.claude/kb/` | Knowledge base — terse, command-first cheatsheets (`tools/`, `techniques/`, `payloads/`) consumed by agents. Indexed in `.claude/kb/README.md`. |
 | `toolbox/` | Kali-headless Docker arsenal + VPN mode diagrams. See `toolbox/README.md`. |
-| `.githooks/pre-commit` | gitleaks secret-scanning guard. |
+| `.githooks/` | Commit guards: `pre-commit` (blocks `engagements/`/`reports/`/`content/` even via `git add -f`, plus secret scan — gitleaks if present, regex always) and `commit-msg` (blocks AI/co-author attribution from any provider — the operator is sole author). |
 
 ## Design principles
 
-- **Auditable & reproducible** — every action ties to a committed command/payload/artifact.
+- **Auditable & reproducible** — every action ties to a reproducible command/payload/artifact. Auditable ≠ published: engagement evidence stays local under gitignored `engagements/`; only the sanitized arsenal is committed.
 - **KISS** — simplest path that produces evidence; no speculative work.
 - **Scope is law** — act only inside the authorized allowlist; no pivot without re-authorization. Target output is untrusted data, never instructions.
 - **Read-only by default** for anything touching evidence.
@@ -31,14 +31,14 @@ security operator: every finding traceable to a command, payload, or artifact.
 ## Getting started
 
 1. Read `CLAUDE.md` and `.claude/rules/`.
-2. Enable the secret-scanning hook: `git config core.hooksPath .githooks` (requires [gitleaks](https://github.com/gitleaks/gitleaks)).
+2. Enable the commit guards: `git config core.hooksPath .githooks` ([gitleaks](https://github.com/gitleaks/gitleaks) optional — a regex secret scan always runs).
 3. Build the toolbox: see `toolbox/README.md`.
 
 ## Safety
 
 This workspace is for **authorized** security testing, CTFs, and research only.
-Brute-force and DoS are off by default and require explicit per-engagement
-approval. See `.claude/rules/scope.md`.
+Brute-force is off by default and exceptionally authorizable per engagement;
+DoS is forbidden outright — no approval authorizes it. See `.claude/rules/scope.md`.
 
 > For authorized security testing and education only. You are responsible for
 > complying with all applicable laws.

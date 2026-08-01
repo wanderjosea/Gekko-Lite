@@ -67,7 +67,7 @@ xdg-open .claude/kb/_graph/kb-graph.html
 | msfrpcd-api | Automate meterpreter/msfconsole via HTTP+MessagePack API — start daemon, auth, console/session control, Python snippets | 2026-07-26 |
 | netexec-crackmapexec | Full NXC/CME cheatsheet: spray, enum, secrets, modules, chisel | 2026-07-01 |
 | password-cracking | Hashcat modes, hash identification, app hash locations, base64url decode | 2026-07-01 |
-| pena-toolbox | Default arsenal: Kali-headless + KB tools in one Docker image; hybrid local/live-target run; `make` wrapper | 2026-07-25 |
+| pena-toolbox | Default arsenal: Kali-headless + KB tools in one Docker image; hybrid local/live-target run; `make` wrapper; hardened detonation | 2026-08-01 |
 | service-enumeration | Command-by-command recon per port/service + internal apps | 2026-06-30 |
 
 ## payloads/
