@@ -54,7 +54,10 @@ def _load(ledger: Path) -> list[dict]:
 
 def _save(ledger: Path, rows: list[dict]) -> None:
     ledger.parent.mkdir(parents=True, exist_ok=True)
-    ledger.write_text("".join(json.dumps(r, ensure_ascii=False) + "\n" for r in rows))
+    data = "".join(json.dumps(r, ensure_ascii=False) + "\n" for r in rows)
+    tmp = ledger.with_suffix(ledger.suffix + ".tmp")
+    tmp.write_text(data)
+    tmp.replace(ledger)  # atomic rename on same fs — never a half-written ledger on crash
 
 
 def _next_id(rows: list[dict]) -> str:
@@ -220,6 +223,9 @@ def cmd_selftest(_a) -> None:
     with contextlib.redirect_stdout(buf):
         cmd_render(ns(ledger=str(led), all=False))
     assert "````" in buf.getvalue()  # fence widened past the payload's backticks
+
+    # atomic save leaves no stray temp file behind
+    assert not led.with_suffix(led.suffix + ".tmp").exists()
 
     print("selftest OK")
 

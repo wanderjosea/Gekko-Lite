@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # PenA pre-commit guard — mechanically enforces .claude/rules/scope.md:
-#   1. nothing under engagements/ (live loot/creds/PII) ever gets committed
+#   1. nothing under engagements/ reports/ content/ (live loot/deliverables) ever
+#      gets committed — even via git add -f, which bypasses .gitignore
 #   2. no *.ovpn (session secrets)
 #   3. no secrets in staged content (gitleaks if present, regex fallback otherwise)
 # Install once:  git config core.hooksPath .githooks
@@ -14,6 +15,8 @@ mapfile -t staged < <(git diff --cached --name-only --diff-filter=AM)
 for f in "${staged[@]}"; do
   case "$f" in
     engagements/*) fail "engagements/ is off-limits ($f). It holds live loot — keep it out of git." ;;
+    reports/*)     fail "reports/ is off-limits ($f). Deliverables are built from live loot — keep them out of git (git add -f won't help)." ;;
+    content/*)     fail "content/ is off-limits ($f). Drafts derive from findings — keep them out of git (git add -f won't help)." ;;
     *.ovpn)        fail "VPN config staged ($f). .ovpn are session secrets — never commit." ;;
   esac
 done

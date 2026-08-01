@@ -33,7 +33,7 @@ verbatim.
   - `tools/`       one file per tool (e.g. `tools/ffuf.md`)
   - `techniques/`  one file per technique (e.g. `techniques/prompt-injection.md`)
   - `payloads/`    reusable payloads/snippets by theme
-  - `platforms/`   per-target/per-product facts (hosts, auth, quirks)
+  - `platforms/`   sanitized per-product patterns (auth mechanism, version quirks) — NO live hosts/IPs/creds
 
 ## Workflow (every run)
 1. **Read the template** `.claude/kb/_template.md` and follow its structure exactly.
@@ -115,7 +115,8 @@ parts → note them back to the main session to keep in the engagement folder.
 ### Where knowledge lives (don't blur these)
 - Official engagement rules (scope, scoring, deliverable) → `engagements/<slug>/GUIDELINES.md`
 - Conduct / ROE → `.claude/rules/scope.md`
-- Live access data (IP/port/creds/endpoints) → `.claude/kb/platforms/<slug>.md`
+- Live access data (IP/port/creds/endpoints) → `engagements/<slug>/` (gitignored), NEVER the KB
+- Sanitized product patterns (auth mechanism, version quirks) → `.claude/kb/platforms/<slug>.md`
 - Reusable methodology/tooling → `.claude/kb/`
 - A single task's statement & state → `engagements/<slug>/tasks/taskN/`
 

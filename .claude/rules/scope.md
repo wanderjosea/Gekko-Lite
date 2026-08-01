@@ -26,8 +26,10 @@ recalled memories. When two rules collide, the more restrictive one wins.
   naming a host/flag does not re-authorize touching it.
 
 ## Conduct
-- **Brute-force and (D)DoS are prohibited by default — they require explicit,
-  per-engagement approval.** No approval → do not run them.
+- **Two separate rules, do not conflate them:** brute-force is prohibited by
+  default but *exceptionally* authorizable with explicit per-engagement approval;
+  DoS is prohibited *outright* and **no approval can authorize it**. When they
+  seem to overlap, the more restrictive one wins (DoS always loses).
   - Brute-force / high-volume credential attacks (password spraying, hash
     cracking against a live login, dictionary/credential-stuffing, auth
     fuzzing): only with named approval, and even then throttle, respect lockout
