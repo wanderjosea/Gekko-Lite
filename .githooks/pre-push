@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+# PenA pre-push guard — last line of defense before commits leave the machine.
+# The operator (Wander Astorga aka Gekk) is the SOLE author. Reject any push
+# carrying a commit with AI co-authorship / generated-by attribution — this is
+# the layer that would have caught the orphan commit GitHub counted as a
+# "claude" contributor. Complements .githooks/commit-msg (which only fires at
+# commit time and can be bypassed with --no-verify or pre-existing history).
+set -euo pipefail
+
+zero='0000000000000000000000000000000000000000'
+pat='co-authored-by:.*(claude|anthropic)|generated with .*claude|noreply@anthropic\.com'
+
+fail() {
+  echo "✗ pre-push blocked: commit $1 carries AI attribution — forbidden in this repo." >&2
+  echo "  Rewrite it (git rebase / commit --amend) to drop the trailer, then push." >&2
+  exit 1
+}
+
+# stdin: <local ref> <local sha> <remote ref> <remote sha>
+while read -r _localref localsha _remoteref remotesha; do
+  [ "$localsha" = "$zero" ] && continue          # branch deletion — nothing to scan
+  if [ "$remotesha" = "$zero" ] || ! git cat-file -e "${remotesha}^{commit}" 2>/dev/null; then
+    # new branch, or remote tip we don't have locally (force-push over unrelated history):
+    # scan every local commit not already on a fetched remote.
+    range=$(git rev-list "$localsha" --not --remotes 2>/dev/null || git rev-list "$localsha")
+  else
+    range=$(git rev-list "$remotesha..$localsha")       # update: only the new commits
+  fi
+  for c in $range; do
+    if git log -1 --format='%B' "$c" | grep -qiE "$pat"; then
+      fail "$c"
+    fi
+  done
+done
+exit 0
