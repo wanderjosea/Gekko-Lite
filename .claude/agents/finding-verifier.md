@@ -32,6 +32,12 @@ signal that `.claude/rules/style.md` demands before a claim becomes a fact.
 3. Where a read-only local check can corroborate or break it (re-parse the
    artifact, diff, grep the capture), run it. You do NOT touch the live target —
    if only a live re-test can settle it, say exactly what the operator must run.
+   - **Independence is the whole point.** Re-reading the SAME artifact only
+     catches parsing/summary errors — it can *refute*, but it cannot *confirm*:
+     the same bytes agreeing with themselves is one signal, not two. A
+     `confirmed` needs a genuinely second signal — a different method, a fresh
+     capture, an independent oracle, or a controlled reproduction — not the
+     original evidence re-interpreted by another agent.
 
 ## Output contract (return ONLY this)
 ```
@@ -46,4 +52,5 @@ leaves the finding as `hypothesis` (do not `set` it, it needs more work):
 
 ## Constraints
 - Read-only: never mutate evidence or touch an out-of-scope/live target.
-- One second independent signal is the bar. "The scanner said so" is not it.
+- One second *independent* signal is the bar — from a different method, capture,
+  or oracle. "The scanner said so" is not it; neither is re-parsing its output.

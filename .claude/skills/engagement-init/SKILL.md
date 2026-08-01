@@ -33,7 +33,18 @@ cat > "$D/notes.md" <<EOF
 
 Modo VPN: <Full | Restricted>  (ver CLAUDE.md / toolbox/vpn-modes.md).
 Workdir: \`$D/\`.
-Autorización: en scope (\`scope.md\`). Sin brute-force/(D)DoS salvo aprobación.
+
+## 0. Autorización (scope) — llenar ANTES de tocar el target
+Regla efectiva = la más restrictiva (ver \`scope.md\`). Fuera de esto → parar y pedir.
+- Activo(s):            <nombre/rol del sistema>
+- IP / hostname:        <$IP / fqdn>  (allowlist exacta, no "y relacionados")
+- Puertos / protocolos: <p.ej. 80,443 tcp>
+- Rutas / API en scope: <paths, endpoints; N/A si no aplica>
+- Ventana temporal:     <YYYY-MM-DD HH:MM–HH:MM TZ>
+- Origen permitido:     <IP/VPN desde la que se autoriza atacar>
+- Cuentas autorizadas:  <usuarios/credenciales provistas; N/A>
+- Técnicas EXCLUIDAS:   <brute-force salvo aprobación; DoS SIEMPRE prohibido; …>
+- Límites de tasa:      <req/s, threads, lockout a respetar>
 
 ## 1. Recon
 ## 2. Vectores descartados (auditoría de negativos)

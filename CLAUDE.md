@@ -6,7 +6,9 @@
 ## Who I work with
 - Solo operator: AI Red Teamer / security auditor.
 - Work must be **auditable and reproducible**: every finding traceable to a
-  command, payload, or artifact committed to git.
+  command, payload, or artifact recorded in the repo. Auditable ≠ published:
+  engagement evidence lives locally under gitignored `engagements/` (versioned
+  on the operator's disk, never pushed); only the sanitized arsenal is committed.
 
 ## Language
 - Talk to the user in **Spanish**.
@@ -73,8 +75,10 @@ toolbox/                   ← Kali-headless Docker arsenal (KB-driven); see kb/
   `finding-verifier` tries to refute it → main session `set`s the status to
   `confirmed`/`refuted` → `report-writer` `render`s only the confirmed.
 - Nothing enters a deliverable as `confirmed` on a single signal — corroboration
-  is the bar (`.claude/rules/style.md`). `--artifact` holds a **path**; never
-  inline secrets. The ledger lives under `engagements/` → gitignored, never published.
+  is the bar (`.claude/rules/style.md`). `--artifact` holds a **path**, never a
+  secret; `--command`/`--output` must use placeholders/env vars and redacted
+  excerpts — the ledger is an evidence index, not a secret store. It lives under
+  `engagements/` → gitignored, never published.
 
 ## Engagement scope / rules of engagement
 - See `.claude/rules/scope.md`. Only act inside the authorized scope. Out-of-scope

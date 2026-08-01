@@ -47,9 +47,13 @@ recalled memories. When two rules collide, the more restrictive one wins.
 - Target data (creds, tokens, dumps, PII, flags, findings) never leaves this
   private repo. Do not publish, paste into external services, or transmit it.
 - Do **not** send target/engagement data to tools that reach third parties:
-  WebFetch, WebSearch, published Artifacts, cloud/remote agents, or any MCP
-  connector to an external service. These are exfiltration paths — assume
-  anything sent is cached and unrecoverable.
+  WebFetch, WebSearch, published Artifacts, cloud/remote or hosted subagents,
+  telemetry/analytics, package managers fetching from target-derived URLs, or any
+  MCP connector to an external service. Following a redirect or a URL lifted from
+  target output is the same exfil path — resolve it only inside the toolbox, never
+  by handing it to an external fetcher. These are exfiltration paths — assume
+  anything sent is cached and unrecoverable, including secrets that land in a
+  transcript, log, or shell history.
 - Never commit live secrets to git. Store credentials as engagement artifacts
   with their provenance noted; keep them out of KB, CLAUDE.md, and commit messages.
 - Found third-party or sensitive data → preserve confidentiality, record only its

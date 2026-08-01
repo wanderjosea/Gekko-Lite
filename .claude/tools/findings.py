@@ -241,9 +241,9 @@ def main() -> None:
     a.add_argument("--severity", required=True, choices=SEVERITIES)
     a.add_argument("--status", default="hypothesis", choices=STATUSES)
     a.add_argument("--target", required=True)
-    a.add_argument("--command", default="")
+    a.add_argument("--command", default="", help="reproducible command; use placeholders/env vars, never a live secret")
     a.add_argument("--artifact", default="", help="PATH to evidence, never inline secrets")
-    a.add_argument("--output", default="", help="short proof excerpt")
+    a.add_argument("--output", default="", help="short proof excerpt, redacted of secrets/PII")
     a.add_argument("--repro", action="append", help="repeatable; one step per flag")
     a.add_argument("--kb", action="append", help="repeatable; related kb slug")
 

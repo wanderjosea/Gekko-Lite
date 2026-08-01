@@ -2,7 +2,7 @@
 title: PenA toolbox (arsenal Kali dockerizado)
 slug: pena-toolbox
 category: tools
-updated: 2026-07-25
+updated: 2026-08-01
 summary: "Default arsenal: Kali-headless + KB tools in one Docker image; hybrid local/live-target run; `make` wrapper"
 tags: [docker, kali, arsenal, toolbox, netexec, impacket, ligolo, metasploit, medusa, hybrid]
 sensitive: false
@@ -31,6 +31,32 @@ make save                             # export para llevar a la máquina del ope
 |---|---|---|
 | Análisis local | sandbox (aquí) | parsing, cracking (`hashcat`/`john`), RE, triaje offline |
 | Target vivo | máquina del operador | `nmap`, `nxc`, `sqlmap`, pivoting — todo lo que toca la red |
+
+### Detonación de código no confiable (untrusted samples)
+`scope.md` exige detonar SOLO en contenedor desechable: static-first (`file`,
+`strings`, `sha256sum`) y recién entonces, si hace falta correrlo, un contenedor
+**sin red, sin root, rootfs de solo lectura, con límites y sin bind mounts** del
+repo/`$HOME`. La invocación canónica (contrasta con `make shell`, que SÍ monta el
+repo — acá **nunca**):
+```bash
+# 1. contenedor endurecido y aislado (detached, para poder meterle la muestra)
+cid=$(docker run -d --network=none --user 65534:65534 \
+  --read-only --tmpfs /tmp:rw,nosuid,nodev,size=256m \
+  --memory 1g --cpus 1 --pids-limit 256 \
+  --cap-drop=ALL --security-opt no-new-privileges \
+  pena-toolbox:latest sleep 3600)
+# 2. transferencia por docker cp — NO bind mount (-v) del repo ni de $HOME
+docker cp ./sample "$cid:/tmp/sample"
+# 3. detoná y observá
+docker exec -u 65534:65534 "$cid" sh -c 'cd /tmp && ./sample'
+# 4. quemá el contenedor (tratalo como comprometido)
+docker rm -f "$cid"
+```
+- `--network=none` (no `--net=host`), sin socket Docker montado, sin `--cap-add`,
+  `no-new-privileges` → sin escalada de caps; `--pids-limit`/`--memory`/`--cpus`
+  acotan fork-bombs y agotamiento. `/tmp` es el único writable (tmpfs efímero).
+- Si necesita red controlada (C2 lab propio), usá una red Docker interna dedicada,
+  jamás `--net=host` ni la VPN del engagement.
 
 ### Inventario por función
 Base **`kali-linux-headless`** (suite CLI estándar de Kali: netcat, dnsutils,
