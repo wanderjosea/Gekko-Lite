@@ -1,0 +1,31 @@
+# Codex adapter for PenA. CLAUDE.md and .claude/ remain the canonical,
+# vendor-neutral policy and role definitions.
+project_doc_fallback_filenames = ["CLAUDE.md"]
+
+[features]
+hooks = true
+network_proxy = true
+
+[permissions.pena-enforcement]
+description = "Enforcement Mode (default): workspace access without Docker or target reachability."
+extends = ":workspace"
+
+[permissions.pena-enforcement.network]
+enabled = false
+
+[permissions.pena-direct-interaction]
+description = "Direct Interaction Mode (Permissive): Docker socket for the guarded toolbox, with no general host egress."
+extends = ":workspace"
+
+[permissions.pena-direct-interaction.network]
+enabled = true
+allow_upstream_proxy = false
+allow_local_binding = false
+
+[permissions.pena-direct-interaction.network.unix_sockets]
+"/var/run/docker.sock" = "allow"
+
+[agents]
+# Limit parallelism because engagement ledgers and deliverables are not safe for
+# concurrent writers. The primary thread is not counted in this value.
+max_concurrent_threads_per_session = 3

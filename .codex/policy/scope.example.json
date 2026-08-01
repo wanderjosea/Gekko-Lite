@@ -1,0 +1,18 @@
+{
+  "engagement": "EXAMPLE_ONLY",
+  "valid_from": "2026-08-01T00:00:00Z",
+  "valid_until": "2026-08-02T00:00:00Z",
+  "mode": "direct-interaction",
+  "targets": [
+    {"host": "192.0.2.10", "protocol": "tcp", "ports": [80, 443]}
+  ],
+  "actions": {
+    "read": true,
+    "scan": false,
+    "state_changes": false,
+    "brute_force": false,
+    "dos": false
+  },
+  "limits": {"requests_per_second": 2, "max_actions": 500},
+  "allowed_tools": ["curl", "openssl"]
+}

@@ -10,6 +10,9 @@ labs/
 .claude/scheduled_tasks.lock
 .claude/settings.local.json
 
+# Runtime-only Codex policy decisions (compact JSONL; never publish)
+.codex/audit/
+
 # VPN configs are PII / session secrets — never commit
 *.ovpn
 

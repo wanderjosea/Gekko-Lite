@@ -19,7 +19,7 @@ RUN apt-get update \
       evil-winrm responder seclists chisel ligolo-ng \
       ffuf feroxbuster gobuster wpscan sqlmap hydra \
       nmap john hashcat smbclient ldap-utils \
-      python3-pip pipx curl ca-certificates \
+      python3-pip pipx curl ca-certificates openvpn iptables iproute2 \
  && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # kerbrute: not packaged in Kali. Pinned static binary for reproducibility.
@@ -36,6 +36,11 @@ RUN pipx install medusa-security
 RUN { echo "# built: $(date -u +%FT%TZ)"; \
       echo "# base:  kalilinux/kali-rolling"; \
       dpkg -l | awk '/^ii/{print $2"="$3}'; } > /opt/tool-versions.txt
+
+COPY prepare_openvpn.py /usr/local/lib/pena/prepare_openvpn.py
+COPY scope_firewall.py /usr/local/lib/pena/scope_firewall.py
+COPY guarded-entrypoint.sh /usr/local/sbin/pena-guarded-entrypoint
+RUN chmod 0555 /usr/local/lib/pena/*.py /usr/local/sbin/pena-guarded-entrypoint
 
 WORKDIR /work
 CMD ["/bin/bash"]

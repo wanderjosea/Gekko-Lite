@@ -1,0 +1,18 @@
+{
+  "description": "PenA fail-closed scope guard for Codex local tools.",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash|apply_patch|Edit|Write|mcp__.*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/usr/bin/python3 \"$(git rev-parse --show-toplevel)/.codex/hooks/pena_guard.py\" hook",
+            "timeout": 5,
+            "statusMessage": "Validating PenA scope"
+          }
+        ]
+      }
+    ]
+  }
+}

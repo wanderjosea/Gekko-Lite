@@ -1,10 +1,10 @@
-// Restricted VPN mode — OpenVPN inside the toolbox container (own netns).
+// Direct Interaction Mode — legacy Restricted VPN topology in a guarded toolbox.
 digraph restricted_vpn {
   rankdir=TB;
   bgcolor="white";
   labelloc="t";
   fontname="DejaVu Sans"; fontsize=20;
-  label="Restricted VPN mode  —  Claude-driven";
+  label="Direct Interaction Mode (Permissive)";
   node  [fontname="DejaVu Sans", fontsize=12, shape=box, style="rounded,filled", color="#334155", fillcolor="#e2e8f0"];
   edge  [fontname="DejaVu Sans", fontsize=10, color="#334155"];
 
@@ -13,19 +13,19 @@ digraph restricted_vpn {
     style="rounded,filled"; fillcolor="#f8fafc"; color="#94a3b8"; fontname="DejaVu Sans"; fontsize=14;
 
     subgraph cluster_ctr {
-      label="toolbox container  (own netns)";
+      label="guarded toolbox container  (own netns; default-drop firewall)";
       style="rounded,filled"; fillcolor="#eef2ff"; color="#6366f1"; fontname="DejaVu Sans"; fontsize=12;
       openvpn [label="OpenVPN", fillcolor="#e0e7ff"];
       tun0c   [label="tun0  (container)\nroute → target net", fillcolor="#e0e7ff"];
-      claude  [label="Claude (CLI)", fillcolor="#e0e7ff"];
-      tools   [label="nmap / ffuf / nxc", fillcolor="#e0e7ff"];
+      claude  [label="Codex (CLI)", fillcolor="#e0e7ff"];
+      tools   [label="signed-scope curl / nmap / openssl", fillcolor="#e0e7ff"];
 
       openvpn -> tun0c;
       claude  -> tools [label="drives", style=dashed];
       tools   -> tun0c;
     }
     host_note [shape=plaintext, style="", fillcolor="none",
-               label="operator: sees only Claude's reports"];
+               label="operator host: no route to target"];
   }
 
   vpn_ep [label="VPN endpoint", fillcolor="#fef9c3"];
@@ -35,6 +35,6 @@ digraph restricted_vpn {
   vpn_ep -> target;
 
   note [shape=note, fillcolor="#fefce8", color="#ca8a04",
-        label="Claude: reaches target via container tun0 (isolated netns).\lOperator host: no route.\lNote: operator is root → can tcpdump the container's tun0\l(encryption is not a boundary vs the host owner).\l"];
+        label="Codex: reaches only signed IP/port/protocol tuples via container tun0.\lOperator host: no route.\lNote: operator is root → can tcpdump the container's tun0\l(encryption is not a boundary vs the host owner).\l"];
   { rank=same; target; note; }
 }

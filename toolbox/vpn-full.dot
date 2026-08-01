@@ -1,39 +1,33 @@
-// Full VPN mode — OpenVPN on the operator's PC; container shares host netns.
+// Enforcement Mode — offline Codex workspace, no Docker socket or target route.
 digraph full_vpn {
   rankdir=TB;
   bgcolor="white";
   labelloc="t";
   fontname="DejaVu Sans"; fontsize=20;
-  label="Full VPN mode  —  operator-driven";
+  label="Enforcement Mode (default)";
   node  [fontname="DejaVu Sans", fontsize=12, shape=box, style="rounded,filled", color="#334155", fillcolor="#e2e8f0"];
   edge  [fontname="DejaVu Sans", fontsize=10, color="#334155"];
 
   subgraph cluster_pc {
-    label="Operator's PC (host)";
+    label="Codex workspace";
     style="rounded,filled"; fillcolor="#f8fafc"; color="#94a3b8"; fontname="DejaVu Sans"; fontsize=14;
 
-    openvpn [label="OpenVPN", fillcolor="#dbeafe"];
-    tun0    [label="tun0  (host)\nroute → target net", fillcolor="#dbeafe"];
+    policy  [label="signed scope + PreToolUse guard", fillcolor="#dbeafe"];
+    blocked [label="Docker socket + target egress\nnot available", fillcolor="#fee2e2", color="#ef4444"];
 
     subgraph cluster_ctr {
-      label="toolbox container  (--net=host → shares host netns)";
+      label="local analysis only";
       style="rounded,filled"; fillcolor="#eef2ff"; color="#6366f1"; fontname="DejaVu Sans"; fontsize=12;
-      claude [label="Claude (CLI)", fillcolor="#e0e7ff"];
-      tools  [label="nmap / ffuf / nxc", fillcolor="#e0e7ff"];
+      claude [label="Codex (CLI)", fillcolor="#e0e7ff"];
+      tools  [label="KB / reports / artifact analysis", fillcolor="#e0e7ff"];
     }
 
-    openvpn -> tun0;
+    policy  -> blocked [label="enforces"];
     claude  -> tools [label="drives", style=dashed];
-    tools   -> tun0  [label="uses host tun0"];
+    tools   -> policy [label="local work only"];
   }
 
-  vpn_ep [label="VPN endpoint", fillcolor="#fef9c3"];
-  target [label="target net", fillcolor="#fee2e2", color="#ef4444"];
-
-  tun0   -> vpn_ep [label="encrypted tunnel"];
-  vpn_ep -> target;
-
   note [shape=note, fillcolor="#fefce8", color="#ca8a04",
-        label="Operator: full target access (host is on the VPN).\lClaude: target reachable — gated by ROE / rules guardrails.\l"];
-  { rank=same; target; note; }
+        label="Codex has no target route in this mode.\lUse for offline analysis and preparation.\l"];
+  { rank=same; blocked; note; }
 }

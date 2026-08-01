@@ -93,28 +93,26 @@ toolbox/                   ← Kali-headless Docker arsenal (KB-driven); see kb/
   `.githooks/commit-msg`.
 
 ## Notes on this environment
-- Egress varies per session — verify, don't assume. Some sandboxes reach the
-  internet + hold a VPN (see Restricted mode); others deny non-allowlisted hosts
-  and only the operator's box touches targets (Full mode).
+- Egress varies per session — verify, don't assume. **Enforcement Mode** denies
+  target reachability. **Direct Interaction Mode (Permissive)** uses the legacy
+  Restricted VPN topology: OpenVPN lives only inside the guarded toolbox.
 - Default arsenal: `toolbox/` — one Kali-headless Docker image. Run it **here**
   for offline analysis on pulled-back artifacts; on the **operator's box** for
   live-target work (target passed at runtime, never baked in). The KB maps the
   situation → tool; see `.claude/kb/tools/pena-toolbox.md`.
 
-## VPN modes (reaching a live target)
-Pick one per session by where OpenVPN runs. Diagrams: `toolbox/vpn-modes.md`.
+## PenA operating modes (reaching a live target)
+Pick one per session. Diagrams: `toolbox/vpn-modes.md`.
 
-- **Full VPN (operator-driven).** OpenVPN runs on the operator's PC; the whole
-  host is on the VPN. Toolbox shares it with host networking:
-  `docker run --rm -it --net=host -v "$PWD":/work -w /work pena-toolbox:latest bash`
-  The operator reaches the target interactively; **Claude has no target access** —
-  designs payloads, operator runs and pastes back. Use when the sandbox can't
-  hold the tunnel or the operator wants hands-on control.
-- **Restricted VPN (Claude-driven).** OpenVPN runs **inside** the toolbox
-  container in Claude's sandbox; `tun0` lives in the container netns. **Claude
-  reaches the target and runs tools directly**; the operator's host is *not*
-  routed to it. Bring up: `make vpn OVPN=~/target.ovpn` (or the detached form for
-  autonomous work). Contains the network blast radius to the container.
+- **Enforcement Mode (default).** Codex has no target reachability and no Docker
+  socket. It can perform offline analysis, prepare commands, and review
+  artifacts; the operator decides whether to start a live session.
+- **Direct Interaction Mode (Permissive).** This is the prior **Restricted VPN**
+  topology under a clearer name. OpenVPN runs **inside** a labelled Kali toolbox
+  in Codex's sandbox; `tun0` lives in the container netns. Codex reaches only the
+  signed target/port/protocol tuples through the structured guard. Start it with
+  `make vpn SCOPE=engagements/NAME/scope.json PUBKEY=/SAFE/operator-scope-public.pem OVPN=/SAFE/target.ovpn`,
+  then launch `pena-codex --mode direct-interaction --container NAME ...`.
   - The `.ovpn` is **mounted at runtime, never baked into the image** (session
     secret + target-agnostic image principle).
   - Not a confidentiality boundary against the operator: they own root, so they
@@ -122,6 +120,6 @@ Pick one per session by where OpenVPN runs. Diagrams: `toolbox/vpn-modes.md`.
     Encryption only hides the tunnel from third parties on the physical wire.
   - Requires (verify per session): docker + `/dev/net/tun` + `NET_ADMIN`. `ping`
     is absent from the image — use `nmap -Pn` to prove reachability.
-- **Do not run both modes on the same `.ovpn` at once.** A dedicated/VIP `.ovpn`
-  has a fixed IP; two simultaneous connections fight and one kicks the other
-  (flapping). Pick one tunnel per session: operator's host **or** the container.
+- **Do not run two VPN sessions on the same `.ovpn` at once.** A dedicated/VIP
+  `.ovpn` has a fixed IP; simultaneous connections fight and one kicks the other
+  (flapping). Use one Direct Interaction toolbox per profile.

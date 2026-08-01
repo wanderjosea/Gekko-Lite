@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+mode=enforcement
+container=
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --mode)
+      [ "$#" -ge 2 ] || { echo "missing value for --mode" >&2; exit 2; }
+      mode=$2
+      shift 2
+      ;;
+    --container)
+      [ "$#" -ge 2 ] || { echo "missing value for --container" >&2; exit 2; }
+      container=$2
+      shift 2
+      ;;
+    *) break ;;
+  esac
+done
+
+case "$mode" in
+  enforcement) permission_profile=pena-enforcement ;;
+  direct-interaction) permission_profile=pena-direct-interaction ;;
+  *) echo "invalid mode: $mode (use enforcement or direct-interaction)" >&2; exit 2 ;;
+esac
+
+if [ "$#" -lt 2 ]; then
+  echo "usage: .codex/bin/pena-codex [--mode enforcement|direct-interaction] [--container NAME] <scope.json> <operator-public.pem> [codex args...]" >&2
+  exit 2
+fi
+
+scope_file=$1
+public_key=$2
+shift 2
+
+[ -f "$scope_file" ] || { echo "scope not found: $scope_file" >&2; exit 2; }
+[ -f "${scope_file}.sig" ] || { echo "scope signature not found: ${scope_file}.sig" >&2; exit 2; }
+[ -f "$public_key" ] || { echo "public key not found: $public_key" >&2; exit 2; }
+
+if [ "$mode" = "direct-interaction" ] && [ -z "$container" ]; then
+  echo "Direct Interaction Mode requires --container NAME from pena_guard.py start" >&2
+  exit 2
+fi
+if [ "$mode" = "enforcement" ] && [ -n "$container" ]; then
+  echo "--container is only valid in Direct Interaction Mode" >&2
+  exit 2
+fi
+
+export PENA_SCOPE_FILE="$(realpath "$scope_file")"
+export PENA_SCOPE_PUBLIC_KEY="$(realpath "$public_key")"
+export PENA_WORKSPACE_ROOT="$(git rev-parse --show-toplevel)"
+scope_id=$(sha256sum "$PENA_SCOPE_FILE" | cut -c1-32)
+state_base=${XDG_STATE_HOME:-${HOME}/.local/state}
+audit_dir="${state_base}/pena/audit"
+mkdir -p "$audit_dir"
+chmod 700 "$audit_dir"
+export PENA_AUDIT_FILE="${audit_dir}/${scope_id}.jsonl"
+[ -z "$container" ] || export PENA_TOOLBOX_CONTAINER="$container"
+
+exec codex \
+  --config default_permissions="\"${permission_profile}\"" \
+  --config web_search='"disabled"' \
+  "$@"

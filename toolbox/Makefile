@@ -17,12 +17,11 @@ shell:     ## Interactive shell with the repo mounted at /work
 run:       ## Run one tool: make run CMD='nmap -sV 10.10.10.10'
 	$(RUN) bash -lc '$(CMD)'
 
-vpn:       ## Restricted VPN: shell with the .ovpn up inside the container (make vpn OVPN=~/x.ovpn)
-	@test -n "$(OVPN)" || { echo "set OVPN=/path/to.ovpn"; exit 1; }
-	docker run --rm -it --cap-add=NET_ADMIN --device=/dev/net/tun \
-	  -v $(abspath $(OVPN)):/vpn/target.ovpn:ro -v $(REPO_ROOT):/work -w /work $(IMAGE):latest \
-	  bash -c 'openvpn --config /vpn/target.ovpn --daemon --log /vpn/openvpn.log; sleep 4; \
-	           ip -4 addr show tun0 | grep -q inet && echo "[+] tun0 up" || echo "[!] check /vpn/openvpn.log"; exec bash'
+vpn:       ## Direct Interaction Mode: guarded VPN toolbox (make vpn SCOPE=... PUBKEY=... OVPN=...)
+	@test -n "$(SCOPE)" || { echo "set SCOPE=engagements/NAME/scope.json"; exit 1; }
+	@test -n "$(PUBKEY)" || { echo "set PUBKEY=/SAFE/operator-scope-public.pem"; exit 1; }
+	@test -n "$(OVPN)" || { echo "set OVPN=/SAFE/target.ovpn"; exit 1; }
+	python3 $(REPO_ROOT)/.codex/hooks/pena_guard.py start --scope $(SCOPE) --public-key $(PUBKEY) --ovpn $(OVPN) --image $(IMAGE):latest
 
 versions:  ## Print the shipped tool/package manifest
 	docker run --rm $(IMAGE):latest cat /opt/tool-versions.txt

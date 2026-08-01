@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PenA signed engagement scope",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["engagement", "mode", "valid_from", "valid_until", "targets", "actions", "limits", "allowed_tools"],
+  "properties": {
+    "engagement": {"type": "string", "minLength": 1},
+    "valid_from": {"type": "string", "format": "date-time"},
+    "valid_until": {"type": "string", "format": "date-time"},
+    "mode": {"enum": ["enforcement", "direct-interaction"]},
+    "targets": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["host", "protocol", "ports"],
+        "properties": {
+          "host": {"type": "string", "description": "Explicit IPv4 literal; no DNS, CIDR, ranges, or related hosts."},
+          "protocol": {"enum": ["tcp", "udp"]},
+          "ports": {"type": "array", "minItems": 1, "items": {"type": "integer", "minimum": 1, "maximum": 65535}}
+        }
+      }
+    },
+    "actions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["read", "scan", "state_changes", "brute_force", "dos"],
+      "properties": {
+        "read": {"type": "boolean"},
+        "scan": {"type": "boolean"},
+        "state_changes": {"type": "boolean"},
+        "brute_force": {"type": "boolean"},
+        "dos": {"const": false}
+      }
+    },
+    "limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["requests_per_second", "max_actions"],
+      "properties": {
+        "requests_per_second": {"type": "number", "exclusiveMinimum": 0},
+        "max_actions": {"type": "integer", "minimum": 1}
+      }
+    },
+    "allowed_tools": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"enum": ["curl", "nmap", "openssl"]}
+    }
+  }
+}
