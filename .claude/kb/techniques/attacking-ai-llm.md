@@ -113,5 +113,5 @@ async with Client("http://localhost:8000/mcp/") as c:
 - TorchServe puerto 8081 (management API) es más sensible que 8080.
 
 ## References
-- Relacionado: [[prompt-injection]], [[llm-output-attacks]], [[data-poisoning]], [[ai-privacy-attacks]], [[web-app-attacks]], [[reverse-shells]], [[medusa]]
+- Relacionado: [[prompt-injection]], [[llm-output-attacks]], [[data-poisoning]], [[ai-privacy-attacks]], [[web-app-attacks]], [[kubernetes-nodes-proxy-kubelet-exec]], [[reverse-shells]], [[medusa]]
 - Lecciones_07_AttackingAI.md, 07_ATTACKING_AI_CHEATSHEET.md

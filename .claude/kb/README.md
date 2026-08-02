@@ -49,6 +49,7 @@ xdg-open .claude/kb/_graph/kb-graph.html
 | attacking-ai-llm | App/system attack flow, AI-infra recon, model extraction, sponge DoS, CVEs, MCP abuse | 2026-06-30 |
 | bad-epoll-privesc | CVE-2026-46242 kernel epoll UAF (race cond.) → root, incl. Android; build/run de la PoC pública | 2026-07-04 |
 | data-poisoning | Label flipping, clean-label, trojan/backdoor, pickle RCE, online poisoning + defense | 2026-06-30 |
+| kubernetes-nodes-proxy-kubelet-exec | Enumerate pods through GET nodes/proxy and reach a privileged hostPath pod via kubelet WebSocket exec | 2026-08-01 |
 | llm-output-attacks | LLM output → XSS/SQLi/RCE/Markdown-exfil/hallucinated-pkgs; payloads + oracle questions | 2026-06-30 |
 | network-pivoting | Chisel, Ligolo-ng, SSH tunneling, proxychains, subnet discovery | 2026-07-01 |
 | password-spray | Spray + credential reuse, Kerberoast/AS-REP/PTH, lockout notes | 2026-06-30 |
