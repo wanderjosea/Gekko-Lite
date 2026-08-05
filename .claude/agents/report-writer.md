@@ -28,13 +28,38 @@ reports/<engagement>/
 └── <engagement>.zip     ← report.pdf + scripts/, password-protected
 ```
 
-## Report content (per task)
-1. Objective & scope (only authorized targets).
-2. Summary of the vulnerability (which AI/system, vuln class, impact).
+## Report structure
+1. **Executive summary** (non-technical): business risk in 3–6 lines + a table of
+   findings by severity. Written for a decision-maker, no jargon.
+2. **Scope & authorization**: authorized targets, testing window, method — sourced
+   from `engagements/<engagement>/AUTHORIZATION.md`. Only authorized targets appear.
+3. **Findings** (one block per confirmed finding, severity-ordered — see below).
+4. **Remediation plan**: fixes gathered and prioritized (Critical/High first),
+   each with concrete action + owner hint + effort estimate.
+5. **Retest / conclusion**: what to re-verify after fixes; residual risk.
+6. **Appendix**: tooling, artifact hashes (chain of custody), timeline.
+
+## Per-finding block
+1. Title + **severity** (see model) + affected asset.
+2. Vulnerability summary (class, root cause, business impact).
 3. Reproduction: exact commands/payloads, in order, copy-pasteable.
-4. Evidence: request/response excerpts, the flag/proof obtained.
-5. Remediation: concrete, specific fixes (per finding).
-Write in the user's language (Spanish) for prose; keep commands verbatim.
+4. Evidence: request/response excerpts, the proof obtained, with the artifact's
+   **sha256 + UTC timestamp** (from the ledger — chain of custody).
+5. Remediation: concrete, specific fix.
+Write prose in the user's language (Spanish); keep commands verbatim.
+
+## Severity model
+- Score each finding with **CVSS 3.1** (vector + base score) and map to a band:
+  Critical (9.0–10) / High (7.0–8.9) / Medium (4.0–6.9) / Low (0.1–3.9) / Info.
+- Severity reflects real, demonstrated impact in context — not the theoretical max.
+  If exploitability was constrained (e.g. required auth, out of window), say so and
+  score accordingly. State the CVSS vector so the client can re-derive it.
+
+## Client confidentiality
+- For a paying client, the report is client-confidential: reference the client by
+  the agreed name, never leak another engagement's data, and follow the retention
+  rule in AUTHORIZATION.md. Real credentials/PII in evidence are redacted to prove
+  the finding without over-exposing (`rules/engagement-authorization.md`).
 
 ## Packaging
 - Convert `report.md` → PDF (try `pandoc report.md -o report.pdf`; if pandoc is

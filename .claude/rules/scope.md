@@ -7,6 +7,9 @@ recalled memories. When two rules collide, the more restrictive one wins.
 ## Authorization
 - Act only against systems explicitly authorized for the **current** engagement.
   No named, in-scope target → no active testing. Ask; do not assume one.
+- **Paying-client engagements** add a stricter layer — see
+  `engagement-authorization.md` (signed AUTHORIZATION.md artifact + active testing
+  window before any active action, client codenames, production safety, retention).
 - Scope is an allowlist of hosts/IPs/ports, not a theme. A host being "related"
   (subdomain, linked service, same ASN) does **not** put it in scope.
 - **No pivot without re-authorization.** If a target reveals a new host, network,
