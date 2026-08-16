@@ -155,6 +155,8 @@ wpscan --url http://TARGET -U users.txt -P rockyou.txt   # brute force
 # RCE: Theme Editor → 404.php → add PHP
 # Ruta config DB: wp-config.php
 ```
+Pre-auth: **CVE-2026-64638** (login XSS por sanitizer-parser differential → RCE vía
+SOME/app-password/plugin-upload) — cadena completa en [[wordpress-cve-2026-64638-xss-rce]].
 
 ### Jenkins (puerto 8080)
 ```bash
