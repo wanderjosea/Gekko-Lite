@@ -47,11 +47,21 @@ xdg-open .claude/kb/_graph/kb-graph.html
 | ai-privacy-attacks | Membership inference, model inversion/extraction; DP-SGD/PATE defenses | 2026-06-30 |
 | ai-redteam-foundations | ML/DL basics, OWASP ML/LLM Top 10, SAIF, GenAI attack surfaces, assessment types + ML-detector evasion angles | 2026-08-05 |
 | android-app-attacks | Referencia de pentest Android: sandbox/permisos/SELinux, estructura APK, análisis estático/dinámico | 2026-08-05 |
+| api-attacks | OWASP API Top 10: BOLA/IDOR (iterar ID→mass abuse), Broken Auth (spray sin rate-limit), BOPLA (excessive data + mass assignment isExempt/role), BFLA (endpoint sin role check), SSRF (file:// URI) | 2026-08-20 |
 | attacking-ai-llm | App/system attack flow, AI-infra recon, model extraction, sponge DoS, CVEs, MCP abuse | 2026-06-30 |
+| attacking-common-apps | App discovery (nmap web ports + EyeWitness/Aquatone screenshots), y RCE por app: WordPress (wpscan+theme editor), Tomcat (mgr WAR/JSP, Ghostcat), GitLab (userenum, ExifTool RCE), Shellshock CGI | 2026-08-20 |
 | av-evasion | Evasión a nivel metodología: obfuscación PS, AMSI, reflective loading, exclusion paths, AppLocker/CLM bypass — cada técnica con su detección | 2026-08-05 |
 | bad-epoll-privesc | CVE-2026-46242 kernel epoll UAF (race cond.) → root, incl. Android; build/run de la PoC pública | 2026-07-04 |
+| broken-authentication | Auth web: hydra http-post-form (F=/S=), user enum por mensaje/timing (ffuf), password-reset logic (security Q brute, username swap), auth bypass (302→200 direct access, param user_id) | 2026-08-20 |
+| bug-bounty-process | Proceso BBP: private/public/VDP vs BBP, leer policy+scope+safe harbor, anatomía de buen reporte (título/CWE/CVSS/PoC/impacto/remediación), calculadora CVSS 3.1, cómo interactuar con triage | 2026-08-20 |
 | c2-operations | Modelo team-server/listener/implante, flujo post-explotación (pivot→lateral→forest) y qué ve el defensor por framework (MSF/Havoc/Sliver) | 2026-08-05 |
+| command-injection | Inyección de comandos: operadores (;/&&/\|\|/%0a), bypass de espacios (%09/${IFS}/{cmd,arg}), de chars (${PATH:0:1}/char-shift), de comandos (quotes/w\\ho\\ami/rev/base64<<<), evasión de WAF | 2026-08-20 |
 | data-poisoning | Label flipping, clean-label, trojan/backdoor, pickle RCE, online poisoning + defense | 2026-06-30 |
+| file-inclusion | LFI: traversal + bypass (....//, %2e%2e%2f, %00, path-trunc), leer source (php://filter base64), RCE (data://, php://input, expect://, RFI http/ftp/smb, log/session poisoning) | 2026-08-20 |
+| file-upload-attacks | Subir web/reverse shell vía upload: bypass client-side, blacklist (.phtml/fuzz ext), whitelist (doble ext shell.php.jpg, char injection %00), Content-Type + magic bytes GIF8 | 2026-08-20 |
+| graphql-attacks | GraphQL: fingerprint (graphw00f), introspection (__schema/__type dump), IDOR por argumento, SQLi UNION en args, batching brute-force (salta rate-limit), mutations para privesc (role:admin) | 2026-08-20 |
+| information-gathering-web | Recon web: whois, dig (records/zone-transfer AXFR), subdomain brute-force (dnsenum/amass), vhost fuzzing (gobuster), CT logs (crt.sh+jq), fingerprinting (curl -I/whatweb/wafw00f/nikto) | 2026-08-20 |
+| js-deobfuscation | Beautify/deobfuscate JS (packer p,a,c,k,e,d → UnPacker/console.log), analizar XHR para descubrir endpoints ocultos (/serial.php), y (de)codificar base64/hex/rot13 en CLI | 2026-08-20 |
 | kubernetes-nodes-proxy-kubelet-exec | Enumerate pods through GET nodes/proxy and reach a privileged hostPath pod via kubelet WebSocket exec | 2026-08-01 |
 | llm-output-attacks | LLM output → XSS/SQLi/RCE/Markdown-exfil/hallucinated-pkgs; payloads + oracle questions | 2026-06-30 |
 | mirth-connect-local-flask-eval | Cadena reusable: Mirth Connect vulnerable, RCE como usuario de servicio y Flask local con eval inseguro ejecutado por root | 2026-08-02 |
@@ -62,8 +72,13 @@ xdg-open .claude/kb/_graph/kb-graph.html
 | privilege-escalation | Linux + Windows/AD privesc chains, Node.js inspect, pillaging, group privileges (DNSAdmins/Print/Server Operators), NTDS dump, real-world gotchas | 2026-08-05 |
 | prompt-injection | Direct/indirect/jailbreak/leak; injection techniques; system-prompt-leak escalation | 2026-06-30 |
 | rbcd-to-domain-admin | RBCD → DA: preconds, impacket addcomputer/rbcd/getST/secretsdump flow, SPN-less RBCD, NTLM-relay RBCD, Bronze Bit, verify + cleanup, Kerberos gotchas | 2026-08-05 |
+| server-side-attacks | SSRF (file://, gopher POST/SMTP, blind port-scan), SSTI (identificar ${7*7}/{{7*7}}/{{7*'7'}}, Jinja2 __globals__ RCE, Twig filter('system')), SSI (<!-- | 2026-08-20 |
 | sql-injection | Login bypass, UNION/blind/time-based, extracción/escritura de archivos, sqlmap flags avanzados, bypass WAF/CSRF | 2026-08-05 |
 | web-app-attacks | Recon/fuzzing, IDOR/API, XXE, SSRF, SSTI, command injection, LFI/RFI, GraphQL, upload bypass, broken auth, CVEs de apps comunes | 2026-08-05 |
+| web-app-fundamentals | Mapa mental de app web para pentest: modelos de infra, 3-tier, front/back, view-source (sensitive data exposure), HTML injection, y los OWASP Top 10 → módulos profundos | 2026-08-20 |
+| web-attacks-idor-xxe | Verb tampering (HEAD/OPTIONS salta basic-auth), IDOR (mass enum vía uid, revertir refs md5(base64) desde JS front-end), XXE (SYSTEM file://, php://filter source, expect RCE, OOB blind exfil) | 2026-08-20 |
+| web-fuzzing | Fuzzing de dirs/archivos/params/vhosts/API con ffuf (FUZZ, -e, -recursion, -mc/-fc/-fs/-fw), gobuster, feroxbuster, wenum; filtrado de salida por code/size/words/lines/regex | 2026-08-20 |
+| web-requests-http | Fundamentos HTTP para pentest web: URL/headers/métodos/códigos, cURL (-v/-i/-u/-b/-H/-d/-X), basic-auth, cookies de sesión, CRUD sobre APIs | 2026-08-20 |
 | wifi-attacks | Metodología de ataque Wi-Fi por protocolo: WPS/WEP/WPA2/WPA3/Evil-Twin/corporativo con oráculo de éxito | 2026-08-05 |
 | windows-nssm-job-escape | NSSM job object kills child processes on service restart — escape with wmic process call create; START /B does NOT work | 2026-07-26 |
 | windows-sedebugprivilege-migrate | SeDebugPrivilege (even Disabled) → migrate to winlogon.exe → SYSTEM; no getsystem or potato needed | 2026-07-26 |
@@ -88,7 +103,6 @@ xdg-open .claude/kb/_graph/kb-graph.html
 ## payloads/
 | Entry | Purpose | Updated |
 |---|---|---|
-| bad-epoll-cve-2026-46242/ | Vendored PoC + full build deps (libxdk, target_db.kxdb) for offline compile — see [[bad-epoll-privesc]] | 2026-07-04 |
 | reverse-shells | One-liners (bash/py/php/ps1/node), msfvenom payload matrix, TTY stabilization, app-specific payloads | 2026-08-05 |
 
 ## platforms/
