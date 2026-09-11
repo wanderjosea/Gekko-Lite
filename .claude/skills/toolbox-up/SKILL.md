@@ -1,7 +1,7 @@
 ---
 name: toolbox-up
 description: >
-  Bring up the PenA Kali toolbox and pick the right VPN mode (Full vs Restricted)
+  Bring up the Gekko-Lite Kali toolbox and pick the right VPN mode (Full vs Restricted)
   to reach a live target. Use when asked to "start the toolbox", "connect the
   VPN", "reach the target", or before any live-target tool run when it is unclear
   where the tunnel/tools run. Covers build, run, VPN selection, and reachability

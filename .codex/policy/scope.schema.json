@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "PenA signed engagement scope",
+  "title": "Gekko-Lite signed engagement scope",
   "type": "object",
   "additionalProperties": false,
   "required": ["engagement", "mode", "valid_from", "valid_until", "targets", "actions", "limits", "allowed_tools"],

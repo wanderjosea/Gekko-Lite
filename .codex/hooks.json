@@ -1,5 +1,5 @@
 {
-  "description": "PenA fail-closed scope guard for Codex local tools.",
+  "description": "Gekko-Lite fail-closed scope guard for Codex local tools.",
   "hooks": {
     "PreToolUse": [
       {
@@ -9,7 +9,7 @@
             "type": "command",
             "command": "/usr/bin/python3 \"$(git rev-parse --show-toplevel)/.codex/hooks/pena_guard.py\" hook",
             "timeout": 5,
-            "statusMessage": "Validating PenA scope"
+            "statusMessage": "Validating Gekko-Lite scope"
           }
         ]
       }

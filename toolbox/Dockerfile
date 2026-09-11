@@ -1,4 +1,4 @@
-# PenA red-team toolbox — Kali headless + the tools the KB actually references.
+# Gekko-Lite red-team toolbox — Kali headless + the tools the KB actually references.
 # Target-agnostic on purpose: the engagement target varies per session and is
 # passed at runtime, never baked in. Hybrid model — see README.
 # Base image pinned by digest for reproducibility (was :latest). Re-pin

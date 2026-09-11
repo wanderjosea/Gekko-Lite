@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# PenA pre-commit guard — mechanically enforces .claude/rules/scope.md:
+# Gekko-Lite pre-commit guard — mechanically enforces .claude/rules/scope.md:
 #   1. nothing under engagements/ reports/ content/ (live loot/deliverables) ever
 #      gets committed — even via git add -f, which bypasses .gitignore
 #   2. no *.ovpn (session secrets)

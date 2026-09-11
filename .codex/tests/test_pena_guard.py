@@ -13,7 +13,7 @@ ROOT = Path(__file__).resolve().parents[2]
 GUARD = ROOT / ".codex" / "hooks" / "pena_guard.py"
 
 
-class PenAGuardTests(unittest.TestCase):
+class Gekko-LiteGuardTests(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
         self.base = Path(self.tmp.name)

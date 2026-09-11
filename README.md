@@ -1,4 +1,4 @@
-# PenA — AI Red-Team & Security Workspace
+# Gekko-Lite — AI Red-Team & Security Workspace
 
 An opinionated Claude Code workspace for AI red-teaming and security auditing.
 It ships the scaffolding — agents, rules, a curated knowledge base, and a Kali

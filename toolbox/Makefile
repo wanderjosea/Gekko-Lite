@@ -1,4 +1,4 @@
-# PenA red-team toolbox. Kali headless + KB tools, one image, two contexts:
+# Gekko-Lite red-team toolbox. Kali headless + KB tools, one image, two contexts:
 # run here for local analysis on pulled-back artifacts; run on the operator's
 # box for live-target work. The target is never baked in — pass it at runtime.
 IMAGE      := pena-toolbox

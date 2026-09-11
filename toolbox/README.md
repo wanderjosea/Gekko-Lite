@@ -1,12 +1,12 @@
-# PenA toolbox
+# Gekko-Lite toolbox
 
 Imagen Docker con la suite de Kali (`kali-linux-headless`) más las herramientas
-concretas que el KB de PenA referencia. Una sola imagen, **target-agnóstica**: el
+concretas que el KB de Gekko-Lite referencia. Una sola imagen, **target-agnóstica**: el
 objetivo varía por sesión y se pasa en runtime, nunca se hornea en la imagen.
 
 ## Modelo híbrido (por qué existe así)
 
-El sandbox de PenA **no tiene salida de red a los targets** del engagement (el
+El sandbox de Gekko-Lite **no tiene salida de red a los targets** del engagement (el
 proxy bloquea hosts no-allowlisted). Por eso la misma imagen se usa en dos
 contextos:
 

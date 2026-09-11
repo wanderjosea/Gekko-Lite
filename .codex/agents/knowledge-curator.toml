@@ -1,5 +1,5 @@
 name = "knowledge-curator"
-description = "Curates sanitized, reusable material into the PenA KB and writes only under .claude/kb/."
+description = "Curates sanitized, reusable material into the Gekko-Lite KB and writes only under .claude/kb/."
 model = "gpt-5.6-luna"
 model_reasoning_effort = "medium"
 sandbox_mode = "workspace-write"

@@ -11,7 +11,7 @@ sensitive: false
 # MEDUSA (AI-first SAST scanner)
 
 ## When to use
-Análisis estático de **código/repos** (no de red) para apps de IA/ML, agentes LLM, servidores MCP y configs de editores IA (Cursor, Cline, Claude Code). Complemento automatizado del agente `code-auditor`. Dos usos en PenA: (1) recon ofensiva sobre el código expuesto de un target — supply-chain de IA, tool/schema poisoning MCP, sinks de prompt-injection; (2) auto-auditoría del propio workspace PenA (configs de agente weaponizadas + secretos en historiales de chat).
+Análisis estático de **código/repos** (no de red) para apps de IA/ML, agentes LLM, servidores MCP y configs de editores IA (Cursor, Cline, Claude Code). Complemento automatizado del agente `code-auditor`. Dos usos en Gekko-Lite: (1) recon ofensiva sobre el código expuesto de un target — supply-chain de IA, tool/schema poisoning MCP, sinks de prompt-injection; (2) auto-auditoría del propio workspace Gekko-Lite (configs de agente weaponizadas + secretos en historiales de chat).
 
 ## Modelo mental: se instala UNA vez, no se clona por uso
 Es un paquete pip (`medusa-security`), no un repo que clonas cada vez. Instalas una vez → queda el comando `medusa`. Lo que "clonas" es el **target** y lo hace la propia tool en modo `--git`.
@@ -52,11 +52,11 @@ Severidad en salida: `CRITICAL / HIGH / MEDIUM / LOW / INFO`. Para triaje, pasar
 - **Secretos**: 21 tipos de credencial, incl. API keys en historiales de Claude/Cursor/Copilot y shell.
 
 ## Gotchas
-- **Entorno PenA**: `pip install` necesita salir a PyPI y `--git` a GitHub. El sandbox tiene proxy restrictivo → correr MEDUSA en la máquina del operador y pegar el output aquí para triaje, como el resto del arsenal.
+- **Entorno Gekko-Lite**: `pip install` necesita salir a PyPI y `--git` a GitHub. El sandbox tiene proxy restrictivo → correr MEDUSA en la máquina del operador y pegar el output aquí para triaje, como el resto del arsenal.
 - Es **SAST**, no ataque activo: reporta patrones/vulnerabilidades en código, no explota nada ni golpea targets de red. No sustituye a la prueba dinámica de prompt-injection ([[prompt-injection]]).
 - 40k+ patrones / 79 scanners → esperar ruido. Filtrar por severidad y usar `--fail-on` para portones, no leer el volumen crudo a mano.
 - Integra herramientas externas (Bandit, ESLint, ShellCheck, PHPStan, Clippy, +70). Si no están instaladas, esos scanners se saltan en silencio — verificar cobertura si un lenguaje "sale limpio" sospechosamente.
-- Trazabilidad PenA: guardar la invocación exacta + versión (`medusa --version`) + el JSON de salida junto a la evidencia; cada finding debe atarse a comando reproducible.
+- Trazabilidad Gekko-Lite: guardar la invocación exacta + versión (`medusa --version`) + el JSON de salida junto a la evidencia; cada finding debe atarse a comando reproducible.
 
 ## References
 - Repo: https://github.com/Pantheon-Security/medusa (AGPL-3.0-or-later)

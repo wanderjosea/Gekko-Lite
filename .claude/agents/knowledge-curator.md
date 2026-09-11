@@ -93,7 +93,7 @@ identifier is permanent.
   date already present in the source; if unknown, write `updated: unknown`.
 
 ## Repository model & methodology you steward
-PenA is the operator's **arsenal**; each `engagements/<slug>/` is a **mission** that
+Gekko-Lite is the operator's **arsenal**; each `engagements/<slug>/` is a **mission** that
 uses it. You are the steward of order across missions. Two layers:
 
 | Layer | Where | What | Your role |
@@ -123,7 +123,7 @@ parts → note them back to the main session to keep in the engagement folder.
 ### Engagement lifecycle (you act at RETRO)
 `scaffold → recon → strategy → execute → report → RETRO (you) → archive`
 At RETRO (mission or big-task close), sweep its notes and distill reusable lessons
-into the KB so the next mission starts sharper. This is the step that makes PenA
+into the KB so the next mission starts sharper. This is the step that makes Gekko-Lite
 compound — never skip it when invoked for a closing engagement.
 
 ### Conventions to enforce

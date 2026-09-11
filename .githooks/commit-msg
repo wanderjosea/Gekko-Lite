@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# PenA commit-msg guard — the operator (Wander Astorga aka Gekk) is the sole
+# Gekko-Lite commit-msg guard — the operator (Wander Astorga aka Gekk) is the sole
 # author. NO AI co-authorship or generated-by trailers, ever, from ANY provider
 # (Claude, Codex/OpenAI, Gemini, or whatever runs this repo next). Blocks them
 # mechanically regardless of any assistant's default behavior.

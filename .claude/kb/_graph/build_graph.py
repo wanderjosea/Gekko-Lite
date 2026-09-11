@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-build_graph.py — Turn the PenA knowledge base into an Obsidian-style graph.
+build_graph.py — Turn the Gekko-Lite knowledge base into an Obsidian-style graph.
 
 Parses the curated `.claude/kb/` notes (frontmatter + wikilinks + tags) and
 emits a single self-contained HTML file with a dependency-free, force-directed
@@ -148,7 +148,7 @@ def render(graph: dict) -> str:
 HTML = r"""<!doctype html>
 <html lang="es"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PenA KB — Grafo de conocimiento</title>
+<title>Gekko-Lite KB — Grafo de conocimiento</title>
 <style>
   :root { color-scheme: dark; }
   html,body { margin:0; height:100%; background:#05070d; overflow:hidden;
@@ -169,7 +169,7 @@ HTML = r"""<!doctype html>
 </style></head><body>
 <canvas id="c"></canvas>
 <div id="hud">
-  <b>PenA · Knowledge Base</b><br>
+  <b>Gekko-Lite · Knowledge Base</b><br>
   __NODES__ nodos · __EDGES__ enlaces (__WL__ wikilinks)
   <div id="legend"></div>
 </div>

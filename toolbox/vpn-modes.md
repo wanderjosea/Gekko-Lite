@@ -1,6 +1,6 @@
-# PenA operating modes — network diagrams
+# Gekko-Lite operating modes — network diagrams
 
-Two PenA modes. The images retain their historic filenames; no
+Two Gekko-Lite modes. The images retain their historic filenames; no
 engagement-specific IPs appear in them.
 
 Diagrams rendered from the `.dot` sources in this dir:

@@ -1,4 +1,4 @@
-# Codex adapter for PenA. CLAUDE.md and .claude/ remain the canonical,
+# Codex adapter for Gekko-Lite. CLAUDE.md and .claude/ remain the canonical,
 # vendor-neutral policy and role definitions.
 project_doc_fallback_filenames = ["CLAUDE.md"]
 

@@ -1,5 +1,5 @@
 ---
-title: PenA toolbox (arsenal Kali dockerizado)
+title: Gekko-Lite toolbox (arsenal Kali dockerizado)
 slug: pena-toolbox
 category: tools
 updated: 2026-08-01
@@ -8,7 +8,7 @@ tags: [docker, kali, arsenal, toolbox, netexec, impacket, ligolo, metasploit, me
 sensitive: false
 ---
 
-# PenA toolbox (arsenal Kali dockerizado)
+# Gekko-Lite toolbox (arsenal Kali dockerizado)
 
 ## When to use
 El arsenal por defecto. Imagen Docker única (`kali-linux-headless` + las tools que

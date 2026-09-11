@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""PenA Codex scope guard.
+"""Gekko-Lite Codex scope guard.
 
 Modes:
   hook    - Codex PreToolUse handler; reads one event from stdin.
@@ -234,7 +234,7 @@ def deny(reason: str, *, event: dict, command: str = "", scope_path: Path | None
         "hookSpecificOutput": {
             "hookEventName": "PreToolUse",
             "permissionDecision": "deny",
-            "permissionDecisionReason": f"PenA: {reason}",
+            "permissionDecisionReason": f"Gekko-Lite: {reason}",
         }
     }))
     return 0
@@ -405,7 +405,7 @@ def expected_container_name(scope: dict, scope_path: Path) -> str:
 
 def inspect_container(container: str, scope_path: Path) -> None:
     if not re.fullmatch(r"pena-[a-z0-9-]{1,48}-[0-9a-f]{8}", container):
-        raise PolicyError("invalid PenA toolbox container name")
+        raise PolicyError("invalid Gekko-Lite toolbox container name")
     result = subprocess.run(
         [docker(), "inspect", "--format", "{{json .Config.Labels}}", container],
         text=True, capture_output=True, check=False,
@@ -433,7 +433,7 @@ def scope_engagement_directory(scope: dict, scope_path: Path) -> tuple[Path, Pat
     workspace_raw = os.environ.get("PENA_WORKSPACE_ROOT")
     workspace = Path(workspace_raw).resolve() if workspace_raw else pena_workspace(str(scope_path.parent))
     if workspace is None:
-        raise PolicyError("PenA workspace root is unavailable")
+        raise PolicyError("Gekko-Lite workspace root is unavailable")
     engagements = workspace / "engagements"
     try:
         relative = scope_path.relative_to(engagements)
@@ -742,7 +742,7 @@ def main() -> int:
             return stop_main(sys.argv[2:])
         return exec_main(sys.argv[2:])
     except PolicyError as exc:
-        print(f"PenA: {exc}", file=sys.stderr)
+        print(f"Gekko-Lite: {exc}", file=sys.stderr)
         return 2
 
 

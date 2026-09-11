@@ -1,5 +1,5 @@
 {
-  "description": "User-level PenA scope guard; inactive outside PenA workspaces.",
+  "description": "User-level Gekko-Lite scope guard; inactive outside Gekko-Lite workspaces.",
   "hooks": {
     "PreToolUse": [
       {
@@ -9,7 +9,7 @@
             "type": "command",
             "command": "/usr/bin/python3 ~/.codex/pena-hooks/pena_guard.py hook",
             "timeout": 5,
-            "statusMessage": "Validating user-level PenA scope"
+            "statusMessage": "Validating user-level Gekko-Lite scope"
           }
         ]
       }

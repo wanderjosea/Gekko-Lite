@@ -1,7 +1,7 @@
 ---
 name: engagement-init
 description: >
-  Scaffold a new engagement working directory under engagements/ with the PenA
+  Scaffold a new engagement working directory under engagements/ with the Gekko-Lite
   standard layout (notes.md skeleton, scripts/, canaries/). Use when starting a
   new authorized target ("new engagement", "set up the box", "scaffold a new
   target"), before recon begins. Creates only the folder structure — does

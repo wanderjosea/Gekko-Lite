@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# PenA pre-push guard — last line of defense before commits leave the machine.
+# Gekko-Lite pre-push guard — last line of defense before commits leave the machine.
 # The operator (Wander Astorga aka Gekk) is the SOLE author. Reject any push
 # carrying a commit with AI co-authorship / generated-by attribution — this is
 # the layer that would have caught the orphan commit GitHub counted as a

@@ -1,12 +1,12 @@
-# Porting PenA to other agents (Codex, Gemini, any LLM)
+# Porting Gekko-Lite to other agents (Codex, Gemini, any LLM)
 
-PenA is not a Claude-only product. It is a set of **rules, restrictions and
+Gekko-Lite is not a Claude-only product. It is a set of **rules, restrictions and
 methodology** that profile any capable LLM coding agent into a disciplined
 pentest operator. Most of it is vendor-neutral markdown and scripts. This guide
 says exactly what ports for free, what is Claude-Code-specific, and how to run
-PenA on OpenAI Codex CLI, Gemini CLI, or anything that reads an instructions file.
+Gekko-Lite on OpenAI Codex CLI, Gemini CLI, or anything that reads an instructions file.
 
-> The mental model is correct: PenA ≈ 90% vendor-neutral. The Claude-Code-specific
+> The mental model is correct: Gekko-Lite ≈ 90% vendor-neutral. The Claude-Code-specific
 > 10% is **orchestration** (subagents + skills) and **part of the enforcement**
 > (permission prompts / plan mode). The doctrine travels; some of its *mechanical*
 > enforcement does not — see Step 3, it is the safety-critical part.
@@ -81,7 +81,7 @@ gate yourself.
   are active under the new tool: `git config core.hooksPath .githooks` then
   `.githooks/test.sh`. These fire regardless of which agent staged the change.
 - **Codex: do NOT run full-auto.** Codex leans to unsupervised autonomy; its
-  full-auto mode executes without approval gates. PenA's *read-only-by-default*
+  full-auto mode executes without approval gates. Gekko-Lite's *read-only-by-default*
   and *scope gating* only hold if a human approves the writes and live-target
   actions. Run Codex in an approval/suggest mode.
 - **Any tool:** `scope.md` is only as binding as the tool lets it be. Treat it as
@@ -101,7 +101,7 @@ If all three pass, the vendor-neutral core is live on the new tool.
 ## Honest limits
 
 - Doctrine ports cleanly; **mechanical enforcement is uneven**. On Codex/Gemini
-  part of PenA's "safe by construction" degrades to "safe if the operator gates
+  part of Gekko-Lite's "safe by construction" degrades to "safe if the operator gates
   it." Budget for that — do not assume the new tool refuses out-of-scope actions
   on its own.
 - **No subagent auto-delegation outside Claude Code.** You orchestrate the roster
@@ -113,7 +113,7 @@ If all three pass, the vendor-neutral core is live on the new tool.
 ## Appendix — bootstrap meta-prompt (any provider)
 
 Paste this into a fresh non-Claude agent (Codex, Gemini, …) to profile it into a
-PenA operator. It is written in English for adherence and makes the agent talk to
+Gekko-Lite operator. It is written in English for adherence and makes the agent talk to
 the operator in Spanish. It carries the non-negotiables inline as a backstop (on
 tools without permission prompts / plan mode, nothing else gates the agent), and
 points at the canonical files for the full doctrine — do not let it drift from
@@ -122,8 +122,8 @@ not recite the hard rules back correctly, it did not load the contract — do no
 hand it a task yet.
 
 ```text
-You are operating inside PenA, an AI red-team & security workspace. Act as a
-disciplined, auditable pentest operator — not a generic coding assistant. PenA is
+You are operating inside Gekko-Lite, an AI red-team & security workspace. Act as a
+disciplined, auditable pentest operator — not a generic coding assistant. Gekko-Lite is
 vendor-neutral: you may be any LLM/provider. These instructions profile you into
 the role.
 

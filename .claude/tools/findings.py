@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""PenA findings ledger — the auditable spine linking every finding to its evidence.
+"""Gekko-Lite findings ledger — the auditable spine linking every finding to its evidence.
 
 One JSONL per engagement (engagements/<eng>/findings.jsonl, which is gitignored —
 live loot never leaves the repo). Each line is one finding:

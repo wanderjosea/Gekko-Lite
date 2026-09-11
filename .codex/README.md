@@ -1,12 +1,12 @@
 # Codex adapter
 
-This directory adapts PenA to Codex without duplicating its canonical policy.
+This directory adapts Gekko-Lite to Codex without duplicating its canonical policy.
 
 - `config.toml` makes Codex discover `CLAUDE.md` as the repository contract and
   limits subagent concurrency.
 - `agents/*.toml` registers Codex-native custom agents. Each adapter loads the
   matching canonical role from `.claude/agents/*.md` before acting.
-- `.claude/rules/scope.md` remains the highest-priority PenA policy. Do not copy
+- `.claude/rules/scope.md` remains the highest-priority Gekko-Lite policy. Do not copy
   its contents here: duplicated safety rules drift.
 
 Project-local Codex configuration and agents load only when the repository is
@@ -50,7 +50,7 @@ invocations; packet-level limits still belong in the Direct Interaction toolbox.
 
 Copy `policy/scope.example.json` into the named engagement and replace every
 example field with the exact authorized values. Generate the signing key outside
-the repository; never place the private key under PenA:
+the repository; never place the private key under Gekko-Lite:
 
 ```bash
 openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:3072 -out /SAFE/operator-scope-private.pem
@@ -109,7 +109,7 @@ They rotate at 25 MiB and store hashes rather than commands or target values.
 The checked-in hook is an immediate project guardrail and Codex re-requires
 trust when its hash changes. The stronger user-level copy lives at
 `~/.codex/pena-hooks/pena_guard.py` with `install/hooks.json` installed as
-`~/.codex/hooks.json`; it detects PenA's marker files and remains inactive in
+`~/.codex/hooks.json`; it detects Gekko-Lite's marker files and remains inactive in
 other repositories. It is outside the workspace sandbox but is not an
 administrator/MDM-managed policy; review and trust its exact hash with `/hooks`.
 Use the installed guard for structured target commands:

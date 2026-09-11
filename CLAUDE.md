@@ -1,4 +1,4 @@
-# PenA — AI Red-Team & Security Workspace
+# Gekko-Lite — AI Red-Team & Security Workspace
 
 > Contract file. Shapes behavior for every session in this repo. Keep it under
 > ~200 lines (official guidance: longer files reduce instruction adherence).
@@ -101,7 +101,7 @@ toolbox/                   ← Kali-headless Docker arsenal (KB-driven); see kb/
   live-target work (target passed at runtime, never baked in). The KB maps the
   situation → tool; see `.claude/kb/tools/pena-toolbox.md`.
 
-## PenA operating modes (reaching a live target)
+## Gekko-Lite operating modes (reaching a live target)
 Pick one per session. Diagrams: `toolbox/vpn-modes.md`.
 
 - **Enforcement Mode (default).** Codex has no target reachability and no Docker

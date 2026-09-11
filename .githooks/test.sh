@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# PenA hook self-test — proves the leak/attribution guards actually block.
+# Gekko-Lite hook self-test — proves the leak/attribution guards actually block.
 # Drives the REAL hooks in this dir against throwaway repos under a temp dir.
 # No framework: plain asserts. Run:  .githooks/test.sh   (exit 0 = all green)
 #
