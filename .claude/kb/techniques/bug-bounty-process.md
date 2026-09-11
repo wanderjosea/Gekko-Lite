@@ -12,7 +12,7 @@ sensitive: false
 
 ## When to use
 Metodología y comunicación en bug bounty / disclosure: elegir programa, mantenerse
-en scope, y escribir un reporte que se triee rápido. Deriva del framework PenA:
+en scope, y escribir un reporte que se triee rápido. Deriva del framework Gekko-Lite:
 el reporte real es proyección de findings confirmados (ver report-writer / findings.py).
 
 ## Tipos de programa

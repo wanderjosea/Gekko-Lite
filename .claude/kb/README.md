@@ -40,21 +40,18 @@ xdg-open .claude/kb/_graph/kb-graph.html
 ## techniques/
 | Entry | Purpose | Updated |
 |---|---|---|
-| active-directory-attacks | BloodHound/cypher, Kerberoast/AS-REP, delegation (KUD/KCD/RBCD), DACL abuse, AD CS ESC1-11, NTLM relay, trust/cross-forest, easy-DA CVEs | 2026-08-05 |
+| active-directory-attacks | BloodHound/cypher, DCSync, ACL abuse, AD CS ESC1, cross-forest, PAM trust | 2026-07-01 |
 | ad-credential-looting | Quick-win creds: SMB null/guest shares, LDAP info/description attrs, hardcoded creds in .NET binaries (strings -e l) | 2026-07-24 |
 | adversarial-evasion | GoodWords; FGSM/I-FGSM/PGD/MI-FGSM/DeepFool; JSMA/sparsity; badge/digit classifier pipeline | 2026-06-30 |
 | ai-defenses | Guardrails, adversarial training, safety fine-tuning (for report remediations) | 2026-06-30 |
 | ai-privacy-attacks | Membership inference, model inversion/extraction; DP-SGD/PATE defenses | 2026-06-30 |
-| ai-redteam-foundations | ML/DL basics, OWASP ML/LLM Top 10, SAIF, GenAI attack surfaces, assessment types + ML-detector evasion angles | 2026-08-05 |
-| android-app-attacks | Referencia de pentest Android: sandbox/permisos/SELinux, estructura APK, análisis estático/dinámico | 2026-08-05 |
+| ai-redteam-foundations | ML/DL basics, OWASP ML/LLM Top 10, SAIF, GenAI attack surfaces | 2026-06-30 |
 | api-attacks | OWASP API Top 10: BOLA/IDOR (iterar ID→mass abuse), Broken Auth (spray sin rate-limit), BOPLA (excessive data + mass assignment isExempt/role), BFLA (endpoint sin role check), SSRF (file:// URI) | 2026-08-20 |
 | attacking-ai-llm | App/system attack flow, AI-infra recon, model extraction, sponge DoS, CVEs, MCP abuse | 2026-06-30 |
 | attacking-common-apps | App discovery (nmap web ports + EyeWitness/Aquatone screenshots), y RCE por app: WordPress (wpscan+theme editor), Tomcat (mgr WAR/JSP, Ghostcat), GitLab (userenum, ExifTool RCE), Shellshock CGI | 2026-08-20 |
-| av-evasion | Evasión a nivel metodología: obfuscación PS, AMSI, reflective loading, exclusion paths, AppLocker/CLM bypass — cada técnica con su detección | 2026-08-05 |
 | bad-epoll-privesc | CVE-2026-46242 kernel epoll UAF (race cond.) → root, incl. Android; build/run de la PoC pública | 2026-07-04 |
 | broken-authentication | Auth web: hydra http-post-form (F=/S=), user enum por mensaje/timing (ffuf), password-reset logic (security Q brute, username swap), auth bypass (302→200 direct access, param user_id) | 2026-08-20 |
 | bug-bounty-process | Proceso BBP: private/public/VDP vs BBP, leer policy+scope+safe harbor, anatomía de buen reporte (título/CWE/CVSS/PoC/impacto/remediación), calculadora CVSS 3.1, cómo interactuar con triage | 2026-08-20 |
-| c2-operations | Modelo team-server/listener/implante, flujo post-explotación (pivot→lateral→forest) y qué ve el defensor por framework (MSF/Havoc/Sliver) | 2026-08-05 |
 | command-injection | Inyección de comandos: operadores (;/&&/\|\|/%0a), bypass de espacios (%09/${IFS}/{cmd,arg}), de chars (${PATH:0:1}/char-shift), de comandos (quotes/w\\ho\\ami/rev/base64<<<), evasión de WAF | 2026-08-20 |
 | data-poisoning | Label flipping, clean-label, trojan/backdoor, pickle RCE, online poisoning + defense | 2026-06-30 |
 | file-inclusion | LFI: traversal + bypass (....//, %2e%2e%2f, %00, path-trunc), leer source (php://filter base64), RCE (data://, php://input, expect://, RFI http/ftp/smb, log/session poisoning) | 2026-08-20 |
@@ -64,89 +61,36 @@ xdg-open .claude/kb/_graph/kb-graph.html
 | js-deobfuscation | Beautify/deobfuscate JS (packer p,a,c,k,e,d → UnPacker/console.log), analizar XHR para descubrir endpoints ocultos (/serial.php), y (de)codificar base64/hex/rot13 en CLI | 2026-08-20 |
 | kubernetes-nodes-proxy-kubelet-exec | Enumerate pods through GET nodes/proxy and reach a privileged hostPath pod via kubelet WebSocket exec | 2026-08-01 |
 | llm-output-attacks | LLM output → XSS/SQLi/RCE/Markdown-exfil/hallucinated-pkgs; payloads + oracle questions | 2026-06-30 |
-| mirth-connect-local-flask-eval | Cadena reusable: Mirth Connect vulnerable, RCE como usuario de servicio y Flask local con eval inseguro ejecutado por root | 2026-08-02 |
-| network-pivoting | Chisel, Ligolo-ng, SSH tunneling, proxychains, subnet discovery + AD lateral movement (PsExec/WMI/WinRM/DCOM, double-hop, IPv6 bypass) | 2026-08-05 |
-| pac4j-jwe-ssh-ca-chain | Validar bypass JWE/PlainJWT en pac4j-jwt y escalar con una CA SSH legible por el foothold | 2026-08-02 |
+| network-pivoting | Chisel, Ligolo-ng, SSH tunneling, proxychains, subnet discovery | 2026-07-01 |
 | packagekit-cve-2026-41651-toctou-lpe | Local TOCTOU race in PackageKit InstallFiles: SIMULATE bypass → overwrite cached paths before idle install → malicious .deb installed as root → SUID bash | 2026-08-11 |
-| password-spray | Spray + credential reuse, Kerberoast/AS-REP/PTH, Exchange/OWA spray, lockout notes | 2026-08-05 |
-| privilege-escalation | Linux + Windows/AD privesc chains, Node.js inspect, pillaging, group privileges (DNSAdmins/Print/Server Operators), NTDS dump, real-world gotchas | 2026-08-05 |
+| password-spray | Spray + credential reuse, Kerberoast/AS-REP/PTH, lockout notes | 2026-06-30 |
+| privilege-escalation | Linux + Windows/AD privesc chains, wildcard chmod symlink, chattr+i, cron.hourly, Node.js inspect, pillaging | 2026-08-02 |
 | prompt-injection | Direct/indirect/jailbreak/leak; injection techniques; system-prompt-leak escalation | 2026-06-30 |
-| rbcd-to-domain-admin | RBCD → DA: preconds, impacket addcomputer/rbcd/getST/secretsdump flow, SPN-less RBCD, NTLM-relay RBCD, Bronze Bit, verify + cleanup, Kerberos gotchas | 2026-08-05 |
+| rbcd-to-domain-admin | RBCD → DA: preconds, impacket addcomputer/rbcd/getST/secretsdump flow, verify + cleanup, Kerberos gotchas | 2026-07-24 |
 | server-side-attacks | SSRF (file://, gopher POST/SMTP, blind port-scan), SSTI (identificar ${7*7}/{{7*7}}/{{7*'7'}}, Jinja2 __globals__ RCE, Twig filter('system')), SSI (<!-- | 2026-08-20 |
 | sql-injection | Login bypass, UNION/blind/time-based, extracción/escritura de archivos, sqlmap flags avanzados, bypass WAF/CSRF | 2026-08-05 |
-| web-app-attacks | Recon/fuzzing, IDOR/API, XXE, SSRF, SSTI, command injection, LFI/RFI, GraphQL, upload bypass, broken auth, CVEs de apps comunes | 2026-08-05 |
+| web-app-attacks | VHost fuzzing, SQLi, LFI, upload bypass, OFBiz/NextJS/OpenNMS/Moodle CVEs, Docker creds | 2026-08-02 |
 | web-app-fundamentals | Mapa mental de app web para pentest: modelos de infra, 3-tier, front/back, view-source (sensitive data exposure), HTML injection, y los OWASP Top 10 → módulos profundos | 2026-08-20 |
 | web-attacks-idor-xxe | Verb tampering (HEAD/OPTIONS salta basic-auth), IDOR (mass enum vía uid, revertir refs md5(base64) desde JS front-end), XXE (SYSTEM file://, php://filter source, expect RCE, OOB blind exfil) | 2026-08-20 |
 | web-fuzzing | Fuzzing de dirs/archivos/params/vhosts/API con ffuf (FUZZ, -e, -recursion, -mc/-fc/-fs/-fw), gobuster, feroxbuster, wenum; filtrado de salida por code/size/words/lines/regex | 2026-08-20 |
 | web-requests-http | Fundamentos HTTP para pentest web: URL/headers/métodos/códigos, cURL (-v/-i/-u/-b/-H/-d/-X), basic-auth, cookies de sesión, CRUD sobre APIs | 2026-08-20 |
-| wifi-attacks | Metodología de ataque Wi-Fi por protocolo: WPS/WEP/WPA2/WPA3/Evil-Twin/corporativo con oráculo de éxito | 2026-08-05 |
 | windows-nssm-job-escape | NSSM job object kills child processes on service restart — escape with wmic process call create; START /B does NOT work | 2026-07-26 |
 | windows-sedebugprivilege-migrate | SeDebugPrivilege (even Disabled) → migrate to winlogon.exe → SYSTEM; no getsystem or potato needed | 2026-07-26 |
 | wordpress-cve-2026-64638-xss-rce | Pre-auth reflected XSS en el login de WP core (sanitizer-parser differential) encadenado a RCE vía SOME → app-password → plugin upload | 2026-08-07 |
-| xss | PoCs reflected/stored/DOM XSS, context-escaping, cookie/session exfil, blind XSS, CSRF pairing | 2026-08-05 |
 
 ## tools/
 | Entry | Purpose | Updated |
 |---|---|---|
-| aircrack-ng | Suite aircrack-ng: modo monitor, scan, deauth, decrypt y crack WEP/WPA — flujo captura→crack | 2026-08-05 |
 | gtfobins-binaries | LOLbins: transfers, shells, pivoting, potatoes, AD enum, cracking | 2026-06-30 |
 | medusa | AI-first SAST scanner (pip): repo/MCP/AI-config scan, secrets, supply-chain CVEs; feeds code-auditor | 2026-07-06 |
 | msfrpcd-api | Automate meterpreter/msfconsole via HTTP+MessagePack API — start daemon, auth, console/session control, Python snippets | 2026-07-26 |
 | netexec-crackmapexec | Full NXC/CME cheatsheet: spray, enum, secrets, modules, chisel | 2026-07-01 |
-| operator-scripts | Catálogo de helpers bash/python propios: recon nmap wrapped, scan sin nmap sobre VPN, rutas VPN, add-to-group LDAP, vhost fuzz, bootstrap tooling AD | 2026-08-05 |
-| os-base-commands | Cheatsheet OS local: búsqueda, permisos/SUID, procesos, cron, red/servicios, firewall Win | 2026-08-05 |
 | password-cracking | Hashcat modes, hash identification, app hash locations, base64url decode | 2026-07-01 |
 | pena-toolbox | Default arsenal: Kali-headless + KB tools in one Docker image; hybrid local/live-target run; `make` wrapper | 2026-08-01 |
 | service-enumeration | Command-by-command recon per port/service + internal apps | 2026-06-30 |
-| web-proxies | Intercept, Repeater/Replay, Intruder/Automate/Fuzzer, scanner activo/pasivo — cuándo usar cada proxy | 2026-08-05 |
 
 ## payloads/
 | Entry | Purpose | Updated |
 |---|---|---|
-| reverse-shells | One-liners (bash/py/php/ps1/node), msfvenom payload matrix, TTY stabilization, app-specific payloads | 2026-08-05 |
-
-## platforms/
-| Entry | Purpose | Updated |
-|---|---|---|
-| papercut-print-deploy | PaperCut 22.x auth bypass, Print Deploy API auth y escalación por servicio root | 2026-08-02 |
-
-## writeups/
-| Entry | Purpose | Updated |
-|---|---|---|
-| writeup-active | SMB anon share con GPP cpassword -> gpp-decrypt -> Kerberoast -> crack -> DA | 2026-08-05 |
-| writeup-administrator | GenericAll password reset -> FTP loot Password Safe (psafe3) -> targeted kerberoast (fake SPN) -> DCSync -> DA | 2026-08-05 |
-| writeup-admirer | robots.txt -> admin-dir con creds.txt -> FTP -> backup web con DB creds -> Adminer LOAD DATA LOCAL | 2026-08-05 |
-| writeup-anomaly | Jenkins admin:admin -> RCE (busybox nc) -> sudo router_config injection -> root -> keytab -> ADCS ESC4 via cuenta de máquina -> DA | 2026-08-05 |
-| writeup-arasaka | Kerberoast -> GenericAll reset password -> GenericWrite -> shadow credential attack -> ESC (AI_Takeover template) impersonando DA -> Domain Admin | 2026-08-05 |
-| writeup-authority | SMB share -> Ansible Vault crack -> PWM webapp -> SSRF/coerción LDAP profile -> ADCS ESC1 via fake computer -> DA | 2026-08-05 |
-| writeup-bruno | FTP anon changelog filtra usuario -> AS-REP roast -> crack (foothold parcial, notas incompletas) | 2026-08-05 |
-| writeup-certified | DACL chain WriteOwner->GenericAll -> Shadow Credentials (PKINIT) -> GenericAll -> ADCS ESC9 (UPN spoof) -> DA | 2026-08-05 |
-| writeup-cicada | guest share (notice HR) da pw default -> rid-brute+spray -> desc-attr leak -> DEV share creds -> SeBackupPrivilege -> SAM dump -> PtH DA | 2026-08-05 |
-| writeup-escapetwo | xlsx leak en SMB -> sa MSSQL xp_cmdshell -> creds reuse -> WriteOwner ADCS ESC4->ESC1 -> DA | 2026-08-05 |
-| writeup-expressaway | Solo SSH en TCP -> UDP scan revela IKE 500 -> ike-scan aggressive mode -> PSK crack hashcat -> SSH -> sudo local privesc | 2026-08-05 |
-| writeup-flight | LFI/RFI captura NTLMv2 -> spray -> share write NTLM theft (.ini) -> webshell -> chisel -> JuicyPotatoNG -> SYSTEM | 2026-08-05 |
-| writeup-forest | RPC null enum users -> ASREP-roast -> crack -> BloodHound -> Account Operators crea user -> WriteDACL propio -> DCSync -> DA | 2026-08-05 |
-| writeup-fragments | NFS export sin creds → IR logs revelan máquina → Timeroasting sin credenciales → crack | 2026-08-05 |
-| writeup-ifrit | RDWeb breakout → git creds → node RCE → SQL linked-server hops → ADCS ESC8→ESC1 → RBCD across forest DCs | 2026-08-05 |
-| writeup-knife | PHP 8.1.0-dev backdoor RCE -> shell james -> sudo knife GTFOBins -> root | 2026-08-05 |
-| writeup-lumon | Writable share + CVE-2025-24054/24071 NTLM leak → capture & crack (foothold/pivot) | 2026-08-05 |
-| writeup-manager | xp_dirtree lee IIS webroot -> zip backup con creds -> ADCS ESC7 (ManageCA) -> DA | 2026-08-05 |
-| writeup-orion | CWP CVE-2022-44877 RCE → sshuttle pivot → WPAD hijack cred capture → cron/SUID root → DA via GenericAll | 2026-08-05 |
-| writeup-poo | .DS_Store leak → dev dir md5 → ffuf poo_connection.txt → 1ª flag + MSSQL creds (foothold) | 2026-08-05 |
-| writeup-puppy | GenericWrite self-add a grupo -> DEV share KeePass -> GenericAll reset+enable cuenta -> backup zip creds -> DPAPI -> DA | 2026-08-05 |
-| writeup-rebound | guest rid-brute -> kerberoast no-preauth -> ACL AddSelf/FullControl chain -> RemotePotato0 -> RBCD via GMSA -> DA | 2026-08-05 |
-| writeup-return | web printer config leak cred -> WinRM -> Server Operators group -> sc.exe binPath hijack -> SYSTEM | 2026-08-05 |
-| writeup-sauna | nombres de empleados en web -> wordlist de usuarios -> ASREP-roast -> crack -> winPEAS filtra autologon -> DCSync -> DA | 2026-08-05 |
-| writeup-shadowgate | Null-session user enum → AS-REP roast → targeted Kerberoast → ADCS ESC8 relay → DCSync | 2026-08-05 |
-| writeup-shadowgate2 | vhost SQLi → upload synced share NTLM capture → ACL chain (WriteOwner) → MSSQL impersonate coerce | 2026-08-05 |
-| writeup-share-the-pain | Writable share NTLM theft → crack → ForceChangePassword → local MSSQL sysadmin → GodPotato | 2026-08-05 |
-| writeup-silver-platter | OSINT usuario en web -> cewl wordlist -> hydra brute (Silverpeas) -> IDOR en notificaciones filtra creds -> SSH -> password reuse en /var/log -> su -> sudo su root | 2026-08-05 |
-| writeup-support | .NET tool en share SMB null -> dnSpy breakpoint filtra LDAP bind -> ldapsearch filtra pass en attr -> RBCD via GenericAll -> DA | 2026-08-05 |
-| writeup-sysco | OSINT→username-anarchy→kerbrute→AS-REP roast→Roundcube→router.cfg (Cisco enable secret crack)→reuse→WinRM→XAMPP MySQL root=SYSTEM→DA | 2026-08-05 |
-| writeup-timelapse | .zip protegido en share -> fcrackzip -> .pfx -> crackpkcs12 -> evil-winrm cert -> PS history filtra cred -> LAPS_Readers -> DA | 2026-08-05 |
-| writeup-trusted-vl | LFI con php://filter leak de source con creds DB -> hash crack -> ForceChangePassword -> writable scheduled-task dir -> DA en child -> golden ticket con SID history -> Enterprise Admins del forest padre | 2026-08-05 |
-| writeup-vintage | pre-2000 computer default pw -> ReadGMSAPassword -> group add -> targeted kerberoast -> DPAPI -> constrained delegation -> DA | 2026-08-05 |
-| writeup-voleur | Dominio Kerberos-only (NTLM off) → generar krb5.conf → auth -k → enumerar shares (foothold) | 2026-08-05 |
-| writeup-welcome | PDF crack → default-password spray → GenericAll/ForceChangePassword chain → ADCS ESC1 | 2026-08-05 |
-| writeup-zephyr | PDF NTLM→Kerberoast→constrained delegation to DC; ligolo pivot to 2nd forest via Zabbix RCE + MSSQL linked servers | 2026-08-05 |
+| reverse-shells | One-liners (bash/py/php/ps1/node), TTY stabilization, app-specific payloads | 2026-07-01 |
 <!-- AUTO-INDEX:END -->
