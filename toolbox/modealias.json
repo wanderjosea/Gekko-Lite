@@ -1,0 +1,11 @@
+{
+  "aliases": [
+    {
+      "id": "sub-128k",
+      "target": "provider/<model-id>",
+      "contextWindow": 131072,
+      "maxTokens": 24576,
+      "reasoning": true
+    }
+  ]
+}

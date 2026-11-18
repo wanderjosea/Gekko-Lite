@@ -1,0 +1,59 @@
+# Local AI-security labs & engagement work — never published.
+labs/
+
+# Agent scratch memory / runtime state — ephemeral, not repo content.
+.claude/agent-memory/
+.claude/scheduled_tasks.lock
+.claude/settings.local.json
+
+# VPN configs are PII / session secrets — never commit
+*.ovpn
+
+# Engagement working dirs hold live loot/creds/PII — never commit
+engagements/
+
+# Stray top-level recon output: keep it under engagements/
+/utu/
+
+# Deliverables & content drafts are built from engagement findings — never commit
+reports/
+content/
+
+# Dual-use kernel exploit + vendored research — kept local, not published
+kb/payloads/bad-epoll-cve-2026-46242/
+*.pyc
+
+# Control-plane runtime state (leases/approvals/audit JSONL) + injected secret
+# env. Only the *.example template is tracked; the real token file never is.
+.gekko-state/
+control-plane.env
+cookies.txt
+
+# Toolbox build artifacts: transient KB + agent-roster staging for the saved image.
+toolbox/_kb/
+toolbox/_agents/
+toolbox/*.tar.gz
+
+# gekko-guard per-engagement allowlist (holds target IPs)
+scope.txt
+
+# Stray target artifacts dumped at the repo root (recon output, captures).
+# They belong in engagements/<codename>/ (gitignored above) — never published.
+# Root-anchored on purpose: tracked HTML lives under kb/_graph/, tooling under
+# toolbox/, so these patterns cannot shadow real repo content.
+/nmap_*
+/*.nmap
+/*.pcap
+/*.har
+/*.html
+
+
+# ephemeral: symlinked to a Pi install only to run toolbox/tests/*.ts (typebox); never committed
+toolbox/node_modules
+
+# spec 015: maquetas y capturas (31 MB) viven sólo en el worktree de reportes
+/specs/015-reportes-rediseno/mockups/
+/specs/015-reportes-rediseno/shots/
+/specs/015-reportes-rediseno/.playwright-cli/
+# un `npm install` en la raíz tampoco se versiona: el repo no tiene paso de instalación
+/node_modules/

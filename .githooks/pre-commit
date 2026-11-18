@@ -1,0 +1,98 @@
+#!/usr/bin/env bash
+# Gekko pre-commit guard — mechanically enforces .claude/rules/scope.md:
+#   1. nothing under engagements/ reports/ content/ (live loot/deliverables) ever
+#      gets committed — even via git add -f, which bypasses .gitignore
+#   2. no *.ovpn (session secrets)
+#   3. no stray target artifacts (paths embedding an IPv4, recon dumps, root-level
+#      *.html) — one `git add -A` away from publishing live recon
+#   4. no secrets in staged content (gitleaks if present, regex fallback otherwise)
+# Install once:  git config core.hooksPath .githooks
+set -euo pipefail
+
+fail() { echo "✗ pre-commit blocked: $1" >&2; exit 1; }
+
+# Staged changes NUL-separated and unquoted (non-ASCII paths match the case patterns).
+# staged = paths that gain content (A/M/T, new side of R/C); touched = every path involved
+# (also deletions and the old side of R/C) — used by the spec rule. Deleting under
+# engagements/ stays allowed because only `staged` goes through the leak patterns.
+staged=(); touched=(); spec_gone=0
+spec=specs/SECURITY-GUARDRAILS-SPEC.md
+while IFS= read -r -d '' st; do
+  case "$st" in
+    R*|C*) IFS= read -r -d '' old; IFS= read -r -d '' new
+           touched+=("$old" "$new"); staged+=("$new"); [ "$old" = "$spec" ] && [ "${st:0:1}" = R ] && spec_gone=1 ;;
+    D)     IFS= read -r -d '' old; touched+=("$old"); [ "$old" = "$spec" ] && spec_gone=1 ;;
+    *)     IFS= read -r -d '' new; touched+=("$new"); staged+=("$new") ;;
+  esac
+done < <(git -c core.quotePath=false diff --cached --name-status -z -M -C)
+[ "$spec_gone" -eq 1 ] && fail "borrar o renombrar $spec no tiene override. La spec viva se queda."
+
+for f in "${staged[@]}"; do
+  case "$f" in
+    engagements/*) fail "engagements/ is off-limits ($f). It holds live loot — keep it out of git." ;;
+    reports/*)     fail "reports/ is off-limits ($f). Deliverables are built from live loot — keep them out of git (git add -f won't help)." ;;
+    content/*)     fail "content/ is off-limits ($f). Drafts derive from findings — keep them out of git (git add -f won't help)." ;;
+    *.ovpn)        fail "VPN config staged ($f). .ovpn are session secrets — never commit." ;;
+  esac
+  # Target-bound filenames: any path carrying an IPv4 is live-engagement data by
+  # construction (nmap_198.51.100.7, 192.0.2.10.xml, ...). KB notes keep generic
+  # names; example IPs live inside note *content*, never in a path.
+  if printf '%s' "$f" | grep -Eq '(^|[^0-9])[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}([^0-9]|$)'; then
+    fail "staged path embeds an IPv4 ($f). Target artifacts belong in engagements/ (off-limits)."
+  fi
+  case "$f" in
+    *.nmap|*.pcap|*.har)
+      fail "recon/capture staged ($f). Raw tool output belongs in engagements/<codename>/ (off-limits)." ;;
+    *.html)
+      if [ "$f" = "${f#*/}" ]; then   # no slash => repo root
+        fail "root-level HTML staged ($f). Root is not a capture drop — tracked HTML lives under kb/_graph/."
+      fi ;;
+  esac
+done
+
+# Spec viva: tocar la frontera de confianza exige actualizar la spec en el mismo commit.
+# La lista espeja specs/SECURITY-GUARDRAILS-SPEC.md §1 — mantener ambas en sync.
+spec_staged=0; boundary=""
+for f in "${touched[@]}"; do
+  [ "$f" = "$spec" ] && spec_staged=1
+  case "$f" in
+    toolbox/gekko-guard.ts|toolbox/gekko-panel.ts|toolbox/shell-session.ts|toolbox/gekko-sidebar.mjs|\
+    .claude/tools/sanitize_target_content.py|.claude/tools/findings.py|.githooks/*|\
+    tools/pi-hitl.sh|tools/gekko-sidebar.sh|setup.sh|\
+    toolbox/gekko-panel-selftest.ts|\
+    toolbox/gekko-workspace.ts|toolbox/gekko-workspace-selftest.ts|\
+    .claude/tools/findings_web.py|tools/report-test.sh|tools/toolbox-test.sh) boundary="${boundary:-$f}" ;;
+  esac
+done
+if [ -n "$boundary" ] && [ "$spec_staged" -eq 0 ] && [ "${GEKKO_SPEC_UNCHANGED:-}" != 1 ]; then
+  fail "frontera de confianza tocada ($boundary) sin $spec. Actualiza la spec en el MISMO commit; si el cambio no altera comportamiento, repite con GEKKO_SPEC_UNCHANGED=1."
+fi
+
+# Secret scan on staged content — regex ALWAYS (catches gitleaks blind spots like
+# some key headers), gitleaks additionally when available (entropy + hundreds of rules).
+pat='gh[pousr]_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{30,}|AKIA[0-9A-Z]{16}|-----BEGIN [A-Z ]*PRIVATE KEY-----|xox[baprs]-[0-9A-Za-z-]{10,}|sk-[A-Za-z0-9]{20,}'
+if git diff --cached --no-color -U0 | grep -E "^\+" | grep -Eq "$pat"; then
+  fail "possible secret in staged changes (pattern match). Remove it, then re-commit."
+fi
+
+if command -v gitleaks >/dev/null 2>&1; then
+  gitleaks git --staged --no-banner --redact \
+    || fail "gitleaks found a secret in staged changes (see above). Remove it, then re-commit."
+fi
+
+# Último check (el más lento): si el commit toca el ledger o el módulo del reporte, corre sus
+# pruebas. Contra el árbol de trabajo, no contra lo preparado (límite aceptado, spec 012 AC31).
+for f in "${touched[@]}"; do
+  case "$f" in
+    .claude/tools/findings.py|.claude/tools/findings_web.py|.claude/tools/sanitize_target_content.py|.claude/tools/report-templates/*)
+      report_test="$(git rev-parse --show-toplevel)/tools/report-test.sh"
+      echo "pre-commit: corriendo tools/report-test.sh porque el commit toca el ledger, el módulo del reporte o el saneador ($f)…" >&2
+      [ -f "$report_test" ] || fail "falta tools/report-test.sh y el commit toca el ledger o el módulo del reporte ($f)."
+      if ! out="$(bash "$report_test" 2>&1)"; then
+        printf '%s\n' "$out" | tail -n 30 >&2
+        fail "tools/report-test.sh falló (últimas líneas arriba). Arréglalo y repite el commit."
+      fi
+      break ;;
+  esac
+done
+exit 0

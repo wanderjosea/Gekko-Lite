@@ -1,0 +1,39 @@
+// Full VPN mode — OpenVPN on the operator's PC; container shares host netns.
+digraph full_vpn {
+  rankdir=TB;
+  bgcolor="white";
+  labelloc="t";
+  fontname="DejaVu Sans"; fontsize=20;
+  label="Full VPN mode  —  operator-driven";
+  node  [fontname="DejaVu Sans", fontsize=12, shape=box, style="rounded,filled", color="#334155", fillcolor="#e2e8f0"];
+  edge  [fontname="DejaVu Sans", fontsize=10, color="#334155"];
+
+  subgraph cluster_pc {
+    label="Operator's PC (host)";
+    style="rounded,filled"; fillcolor="#f8fafc"; color="#94a3b8"; fontname="DejaVu Sans"; fontsize=14;
+
+    openvpn [label="OpenVPN", fillcolor="#dbeafe"];
+    tun0    [label="tun0  (host)\nroute → target net", fillcolor="#dbeafe"];
+
+    subgraph cluster_ctr {
+      label="toolbox container  (--net=host → shares host netns)";
+      style="rounded,filled"; fillcolor="#eef2ff"; color="#6366f1"; fontname="DejaVu Sans"; fontsize=12;
+      claude [label="Claude (CLI)", fillcolor="#e0e7ff"];
+      tools  [label="nmap / ffuf / nxc", fillcolor="#e0e7ff"];
+    }
+
+    openvpn -> tun0;
+    claude  -> tools [label="drives", style=dashed];
+    tools   -> tun0  [label="uses host tun0"];
+  }
+
+  vpn_ep [label="VPN endpoint", fillcolor="#fef9c3"];
+  target [label="target net", fillcolor="#fee2e2", color="#ef4444"];
+
+  tun0   -> vpn_ep [label="encrypted tunnel"];
+  vpn_ep -> target;
+
+  note [shape=note, fillcolor="#fefce8", color="#ca8a04",
+        label="Operator: full target access (host is on the VPN).\lClaude: target reachable — gated by ROE / rules guardrails.\l"];
+  { rank=same; target; note; }
+}

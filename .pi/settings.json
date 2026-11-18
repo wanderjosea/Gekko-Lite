@@ -1,0 +1,10 @@
+{
+  "compaction": {
+    "modelOverrides": {
+      "provider/<model-id>": {
+        "reserveTokens": 24904,
+        "keepRecentTokens": 20000
+      }
+    }
+  }
+}

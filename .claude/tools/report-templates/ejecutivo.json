@@ -1,0 +1,26 @@
+{
+ "etiqueta": "Ejecutivo",
+ "acento": "grafito",
+ "borrador": ["titulo", "cliente", "periodo", "version", "autor", "clasificacion", "resumen", "alcance", "limitaciones", "recomendaciones"],
+ "textos": {
+  "es": {"antetitulo": "Informe ejecutivo", "subtitulo": "Informe ejecutivo de pentesting",
+         "titulo": "Evaluación de seguridad", "cliente": "Cliente no definido", "autor": "GEKKO Offensive Security",
+         "periodo": "Pendiente de definir", "version": "0.1 · Borrador", "clasificacion": "CONFIDENCIAL · BORRADOR",
+         "rotulos": {"cliente": "Preparado para", "autor": "Preparado por", "periodo": "Período de evaluación", "version": "Versión"},
+         "conteo": {"critical": "Críticas", "high": "Altas", "medium": "Medias", "low": "Bajas"}},
+  "en": {"antetitulo": "Executive report", "subtitulo": "Executive penetration testing report",
+         "titulo": "Security assessment", "cliente": "Client not defined", "autor": "GEKKO Offensive Security",
+         "periodo": "To be defined", "version": "0.1 · Draft", "clasificacion": "CONFIDENTIAL · DRAFT",
+         "rotulos": {"cliente": "Prepared for", "autor": "Prepared by", "periodo": "Assessment period", "version": "Version"},
+         "conteo": {"critical": "Critical", "high": "High", "medium": "Medium", "low": "Low"}}
+ },
+ "secciones": [
+  {"titulo": {"es": "Resumen ejecutivo", "en": "Executive summary"}, "prosa": "resumen"},
+  {"titulo": {"es": "Alcance", "en": "Scope"}, "prosa": "alcance"},
+  {"titulo": {"es": "Hallazgos por severidad", "en": "Findings by severity"}, "conteo": true},
+  {"titulo": {"es": "Hallazgos", "en": "Findings"},
+   "hallazgos": {"tabla": ["id", "title", "severity", "target"], "ficha": "corta", "campos": ["impact"]}},
+  {"titulo": {"es": "Limitaciones", "en": "Limitations"}, "prosa": "limitaciones"},
+  {"titulo": {"es": "Recomendaciones", "en": "Recommendations"}, "prosa": "recomendaciones"}
+ ]
+}

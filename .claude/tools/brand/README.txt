@@ -1,0 +1,1 @@
+Fuente: Gekko-Brand-Kit v1.0 (01_Logos/isotipo y horizontal), reducidos con ImageMagick (PNG8, <8 KB). Se incrustan como data: en el CSS (spec 018 D8). Uso: color/blanco sobre oscuro, negro sobre claro.

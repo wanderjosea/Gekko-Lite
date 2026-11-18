@@ -1,0 +1,55 @@
+# Technical plan 014 — Execution mode with Pi open
+
+> Status: `APROBADO` — the operator approved implementing it if the independent review passed ("si pasa la revisión estoy de acuerdo, implementala", 2026-11-16); it passed with fixes, already applied (spec §9).
+> Translates [`spec.md`](spec.md) into how. Everything builds on the 013 code; the container is not changed.
+
+## 1. Design decisions
+
+**D1 — The current mode is process state.** `GEKKO_EXEC` and `GEKKO_TOOLBOX` (validated ID) are already read on every `tmux()` call in `shell-session.ts`, `tmuxRO` of the guard and `toolboxBashBlock`. The live switch rewrites them; this way the `bash` block follows the mode without being touched (AC13). Nobody re-reads `exec` after launch: neither `session_start` nor the periodic check (AC10). The new state goes in `runtime.exec` (in `gekko-panel.ts`, next to `runtime.mirror`): `{ state: "levantando" | "lista" | "caída" | null, reason: string }`. In `os` the state is `null`. When the guard loads: `toolbox` with a valid ID → `lista`; `toolbox` without ID → `caída`. `runtime` survives `session_start`.
+
+**D2 — Each shell stores where it was born.** `Owned` (shell-session) and `Shell` (panel registry) gain `place: { mode: ExecMode; container?: string }`, read from the environment before the first `await` of `session_new` (AC12). `tmux(args, plazo, socket, place?)` and `tmuxRO(args, place?)` use the place they receive and, without one, the current one. Every operation on an own shell (`ours`, `session_send`, `session_read`, `session_kill`, the panel refresh) passes the place of that shell. `session_list` queries the current place plus each distinct place of the own shells and labels each one. `session_new` refuses a name that already belongs to a live own shell in the other place.
+**The socket directory comes from the place, not from module load:** today `SOCK_DIR` is set once; it becomes computed per call with `socketDir`, adjusted as follows (AC9): toolbox place → always `<ws>/.gekko-sockets` (an inherited `GEKKO_TMUX_DIR` is ignored: that directory is not mounted in the container); `os` place → the inherited `GEKKO_TMUX_DIR` if its real path is outside the real path of the workspace (today it is decided by the name `engagements`); otherwise `tmpdir()/gekko-sockets` if it is outside; if neither, the shell with its own socket is refused. The workspace is validated before the socket directory is created (today `sockPath` creates it first). A host tmux server with the socket inside the mount lets the container run on the host (`tmux -S <sock> run-shell`, tested).
+
+**D3 — `session_new` fails naming the state.** In `toolbox`, if `runtime.exec.state` is `levantando` or `caída`, it returns FAIL with the state and the reason before invoking anything (AC4). Also, before creating a shell in the toolbox it compares `docker inspect --type container --format '{{.Id}} {{.State.Running}}' <ID>` with the validated ID (AC3): a **named** container with the old ID resolves by ID, but `inspect` returns its own. Applies with and without TUI.
+
+**D4 — Periodic check (only with `ctx.mode === "tui"`).** In the 3 s timer the guard already has, **before** the early return of `refreshShellsLive` when there are no shells (exactly when the state matters for the next `session_new`), an asynchronous call with a 3 s deadline: `docker inspect --type container --format '{{.Id}} {{.State.Running}}' <ID>`. `lista` only if the ID matches and it is running; otherwise `caída` with the reason. `caída` does not return to `lista` on its own (AC5). Worst-case detection: 6 s (AC3 asks for 10).
+
+**D5 — Starting is the same path as the launcher.** The guard reimplements nothing: it runs, asynchronously and with a 120 s deadline, the same CLI that `tools/pi-hitl.sh` uses (`gekko-workspace.ts toolbox <ws>`), which runs `checkWorkspace` (with D11) and `ensureToolbox` (REQ-TBX-003, 007), and accepts its output only if it is a 64-hex ID. Order: state `levantando`, `GEKKO_EXEC=toolbox`, `GEKKO_TOOLBOX` deleted → if `exec` does not exist, create it with `os` (the container mounts it and requires a regular file) → CLI → on success, `GEKKO_TOOLBOX=<ID>`, `lista`, and only then `exec` changes to `toolbox` (AC11); on failure, `caída` with the first line of the error (no control characters, trimmed) and the saved mode unchanged. An epoch counter discards the result of a start that is no longer the current one. Injectable executor.
+
+**D6 — Saving the mode.** New `writeExecMode(dir, mode)` in `gekko-workspace.ts`: if the file does not exist it creates it (exclusive creation, without following links); if it exists, it opens it without following links, requires a regular file, and writes **in place** (without renaming: the container has it mounted by inode, REQ-TBX-007).
+
+**D7 — Overlay.** `policyOverlayBody` gains an "ejecución (dónde nacen las shells · no es una autorización)" block ("execution (where shells are born · is not an authorization)") with one row without a checkbox. Pure functions in `gekko-panel.ts`: `execRow`, `execConfirmLines`, `execStepKey`. The confirmation lives inside the overlay and only `s`/`S` confirms; any other key closes it without changing anything. Row action: in `os` → switch to toolbox; in `toolbox` `lista` → back to `os`; in `caída` → **retry** (it stays in toolbox and repeats D5; it does not go through `os`: it is not loosened to harden); in `levantando` it does nothing and says so. From `caída` to `os` one goes through `/gekko-toolbox off` (D9). No workspace: the row says how to create one and does not open a confirmation. When the confirmation toward toolbox opens, the guard resolves the real path of the directory and does a `docker inspect` by name, asynchronous and with a 3 s deadline (the key handler cannot be left waiting; `s` is accepted only once the result has arrived), to say **create**, **start** or **adopt**; if the directory is a link, the confirmation says so and does not offer to continue. It also shows whether `GEKKO_OVPN` is defined, with the warning not to use the same `.ovpn` in two tunnels.
+
+**D8 — Rail and bar.** `PanelState` gains `exec` (mode, state, reason) and each shell its place; the reader validates them and tolerates their absence. An `ejecución` row in the GUARD card and a segment in the bar. The rail process gains no path toward `docker` or toward the mode file (AC2: text contract with mutations). Precedent to follow: the `visor` row (REQ-TUI-027).
+
+**D9 — `/gekko-toolbox off`.** Operator command in the guard; it refuses if `ctx.mode` is not `tui`, without a workspace, and in `levantando`. New `inspect` by name (`gekko-tb-<ws>`); if the session has a validated ID and the one from `inspect` is another, it refuses. It asks for confirmation (`ctx.ui.confirm`) when the container is running or the mode is `toolbox`, with the text of AC17. Then `docker stop <ID>` (only if running; if it fails, it says so and changes nothing), mode to `os` (environment and file), and the shells of that place are marked closed in the registry. Already stopped and in `os`: it says so and calls nothing. If `inspect` fails or the ID is another: nothing is stopped, it says why, and with the mode in `toolbox` it offers —with confirmation— to switch to `os`. Other argument: state and usage.
+
+**D10 — Mirror.** `mirrorWindowArgs` accepts the container: the window runs `docker exec -it <ID> tmux -S <socket> attach -t <id>`, so the client runs inside the container (AC18). `mirrorDecision` stops refusing toolbox mode. Opening, marking and closing the window (`new-window`, `set-option -w`, `kill-window`) ALWAYS go to the host tmux, with the `os` place forced: today all three go through the mode routing. **Closing:** `kill-window` alone leaves the client attached inside the container (tested); first `docker exec <ID> tmux -S <socket> detach-client -s <id>` is run, which removes the client and closes the window by itself, and `kill-window` remains as a fallback. The list of open windows stores, per window, place, socket and session id. On `session_start` the closing runs asynchronously; on `session_shutdown`, synchronously with a total cap of 2 s for all the detaches, and whatever does not fit in the cap is closed only with `kill-window`.
+
+**D11 — Symbolic link.** `checkWorkspace` and `createWorkspace` refuse a workspace directory whose last component is a symbolic link (`lstat`), before reading `scope.txt`.
+
+**D12 — Model warning and launcher.** `ws_cli prompt` describes both modes, which one applies at launch and that the operator can change it; the result of `session_new` gains `lugar=os|toolbox` ("place="). In `tools/pi-hitl.sh`: the container-active warning is printed at the start of `cleanup_after_pi`, before silencing the output, and also outside tmux, when `docker inspect` says `gekko-tb-<ws>` is running (today a second `trap … EXIT` overwrites the first and inside tmux the warning does not appear). The query goes behind `command -v docker` and with `timeout`, so that whoever has no docker does not see an error on every exit. In `os` outside tmux the launcher today does `exec pi`, so nothing runs afterwards: it is replaced by a normal call that preserves Pi's exit code (a TERM signal to the launcher's pid no longer reaches Pi; the toolbox path already worked that way). The banner line changes to say "al lanzar" ("at launch").
+
+## 2. Files
+| File | Change |
+|---|---|
+| `toolbox/gekko-workspace.ts` + selftest | D6, D11, D12 (prompt) |
+| `tools/pi-hitl.sh`, `tools/ws-test.sh` | D11 (case), D12 (exit warning inside and outside tmux, banner), AC11 |
+| `toolbox/gekko-panel.ts` + selftest, `toolbox/gekko-sidebar.mjs`, `tools/tui-test.sh` | D1 and D2 (types), D7, D8, D10 (argv and decision) |
+| `toolbox/shell-session.ts`, `toolbox/tests/handler-harness.ts` | D2, D3, D10, D12 (`lugar=`) |
+| `toolbox/gekko-guard.ts` (and its selftest) | D1, D2 (refresh), D4, D5, D7 (wiring), D9 |
+| `toolbox/tests/handler-harness.ts` with `GEKKO_TEST_TOOLBOX=1`, `tools/toolbox-test.sh` | cases with real docker (R) |
+| `specs/SECURITY-GUARDRAILS-SPEC.md` | new and modified requirements |
+| `docs/pi-hitl.md`, `docs/prompts/pi-hitl.md`, `CLAUDE.md`, `AGENTS.md`, `specs/README.md` | documentation |
+
+## 3. Requirements in the living spec
+New: `REQ-WS-011` (symbolic link) · `REQ-TBX-009` (state, check and `session_new` failure) ·
+`REQ-TBX-010` (live switch, in-memory and saved mode) · `REQ-TBX-011` (place per shell and socket directory) ·
+`REQ-TBX-012` (`/gekko-toolbox off`) · `REQ-TUI-028` (overlay "ejecución" block) · `REQ-TUI-029` (rail and bar
+show, do not change) · `REQ-TMUX-017` (mirror of a toolbox shell) · `REQ-WS-012` (exit warning).
+Modified: `REQ-TMUX-011`, `REQ-TBX-001`, `REQ-TBX-004`, `REQ-TBX-005`, `REQ-TBX-006`, `REQ-TBX-008`.
+
+## 4. Risks
+- **`docker exec -it` in the mirror window** needs a terminal: the tmux pane provides it. Untested until R.
+- **Race in the switch:** the place is read before the first `await`, so the shell is born entirely in one place.
+- **Remaining limits:** those of spec §6.

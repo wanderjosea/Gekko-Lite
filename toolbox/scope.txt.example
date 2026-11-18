@@ -1,0 +1,9 @@
+# gekko-guard scope — allowlist de targets in-scope (una línea por host/IP/CIDR).
+# '#' comenta. El guard bloquea (fail-closed) cualquier IPv4 o rango (CIDR, a-b, *) del comando que NO quepa entero acá.
+# Las interfaces locales, loopback (127/8) y 0.0.0.0 son SIEMPRE in-scope (reverse shells,
+# listeners). El scoping por hostname lo hace el egress allowlist del contenedor, no esto.
+#
+# Ejemplo (IPs de documentación RFC5737 — reemplazá por el/los target(s) reales):
+192.0.2.10
+# Rango (si estuviera autorizado):
+# 192.0.2.0/24

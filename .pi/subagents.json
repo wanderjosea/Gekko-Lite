@@ -1,0 +1,6 @@
+{
+  "maxConcurrent": 1,
+  "maxConcurrentForeground": 1,
+  "maxSubagentDepth": 0,
+  "backgroundByDefault": false
+}

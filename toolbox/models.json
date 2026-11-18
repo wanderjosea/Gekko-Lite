@@ -1,0 +1,11 @@
+{
+  "providers": {
+    "provider": {
+      "baseUrl": "${GEKKO_LLM_URL}",
+      "api": "openai-completions",
+      "apiKey": "${GEKKO_PROVIDER_KEY}",
+      "compat": { "supportsDeveloperRole": false, "supportsReasoningEffort": false },
+      "models": []
+    }
+  }
+}
