@@ -44,83 +44,49 @@ gitignored and never published.
 
 ## Architecture
 
+**Running a tool call** (Pi checks every call in code; Claude Code and Codex rely on the
+rules; the container is the hard boundary for all three):
+
 ```mermaid
 flowchart TB
-    Op["Operator"]
-
-    subgraph Harness ["Agent harness (pick one per session)"]
-        CC["Claude Code"]
-        Codex["Codex"]
-        Pi["Pi"]
-    end
-
-    subgraph Contract ["Contract layer - every harness"]
-        CM["CLAUDE.md / AGENTS.md"]
-        Rules[".claude/rules/<br/>scope, style, engagement-authorization"]
-        Hooks[".githooks/<br/>no engagements/ in git, secret scan,<br/>no AI attribution, spec-touch rule"]
-    end
-
-    subgraph Guard ["gekko-guard - Pi only, in-process, best-effort"]
-        Broker["Broker, before each tool call<br/>DoS, destructive, scope, brute-force,<br/>per-session loop and call caps"]
-        Firewall["Output firewall, after each tool result<br/>sanitize and fence target output as untrusted"]
-        Panel["TUI panel and status bar<br/>guard, scope, shells, findings, changes"]
-    end
-
-    subgraph Agents ["Agent layer"]
-        Sub["Subagents<br/>recon-mapper, finding-analyzer, finding-verifier,<br/>exploit-developer, report-writer, ..."]
-        Skills["Skills<br/>pentest-cycle, ai-redteam-cycle, agent-harness-audit,<br/>engagement-init, toolbox-up, spec-new, tui-design"]
-    end
-
-    subgraph Evidence ["Evidence and reporting"]
-        Ledger["findings.py<br/>append-only findings.jsonl per workspace"]
-        Web["findings_web.py - Report module<br/>127.0.0.1 only: findings, status, evidence,<br/>comments, attachments, Provider chat"]
-        Report["Report page and downloads<br/>Technical / Executive templates, en / es,<br/>Markdown, HTML, print-to-PDF"]
-    end
-
-    subgraph Workspace ["Workspace and shells"]
-        WS["engagements/NAME/<br/>scope.txt, findings.jsonl, exec mode"]
-        Shells["Persistent tmux shells<br/>mirrored next to Pi"]
-    end
-
-    subgraph Execution ["Execution layer - the hard boundary"]
-        Toolbox["Kali toolbox container per workspace<br/>gekko-tb-NAME, only the workspace mounted"]
-        Egress["Egress allowlist from scope.txt<br/>(set up by the operator)"]
-        VPN["VPN modes<br/>operator host or inside the container"]
-    end
-
-    Target["Authorized target"]
-    LLM["OpenAI-compatible endpoint<br/>GEKKO_LLM_URL, GEKKO_LLM_KEY"]
-
-    subgraph Specs ["Spec-anchored development - trust boundary only"]
-        Living["specs/SECURITY-GUARDRAILS-SPEC.md<br/>REQ = MUST + WHEN/THEN + executed case,<br/>known gaps listed"]
-        Gate["Selftest gate<br/>fails on a REQ with no case<br/>or a case with no REQ"]
-    end
-
-    Op --> Harness
-    Harness --> Contract
-    Contract --> Agents
-    Pi -. "loaded with pi -e" .-> Guard
-    Pi --> LLM
-    Agents --> Ledger
-    Ledger --> Web
-    Web --> Report
-    Web -. "optional chat" .-> LLM
-    Agents -- "Pi: every tool call" --> Broker
-    Broker --> Shells
-    Shells --> Toolbox
-    Agents -- "Claude Code / Codex: direct, contract and rules only" --> Toolbox
-    WS --- Ledger
-    WS --- Shells
-    Toolbox --- Egress
-    Toolbox --- VPN
-    Egress --> Target
-    Toolbox -- "tool output" --> Firewall
-    Firewall --> Agents
-    Living <--> Gate
-    Gate -. "runs the selftests of" .-> Guard
-    Gate -. "and of" .-> Evidence
-    Hooks --> Living
+    Op(["Operator"]) --> H["Agent harness<br/>Claude Code · Codex · Pi"]
+    H -->|"Pi"| G["gekko-guard<br/>checks every tool call<br/>fences every result"]
+    H -->|"Claude Code / Codex<br/>(rules only)"| TB
+    G --> TB["Toolbox container<br/>egress allowlist · hard boundary"]
+    TB --> T(["Authorized target"])
+    H -.->|"model"| LLM["OpenAI-compatible endpoint"]
 ```
+
+**From findings to the client report:**
+
+```mermaid
+flowchart LR
+    A["Agent + shells"] -->|"findings"| W["Workspace<br/>findings.jsonl"]
+    W --> R["Report module<br/>127.0.0.1 only"]
+    R --> D["Technical / Executive<br/>Markdown · HTML · PDF"]
+    R -.->|"optional chat"| LLM["OpenAI-compatible endpoint"]
+```
+
+- **Agent harness:** the contract (`CLAUDE.md` / `AGENTS.md`), rules, subagents and skills.
+  The endpoint is set with `GEKKO_LLM_URL` and `GEKKO_LLM_KEY`.
+- **gekko-guard** (Pi only, best-effort): before a call it checks scope, DoS, destructive
+  actions, brute-force, loops and call caps; after a result it sanitizes and fences the
+  output as untrusted. It also drives the TUI panel.
+- **Toolbox container** `gekko-tb-NAME`: only the workspace is mounted; egress allowlist;
+  VPN modes.
+- **Workspace** `engagements/NAME/`: `scope.txt`, `findings.jsonl`, tmux shells.
+- **Report module:** `findings.py` → `findings_web.py`, en / es; status changes (including
+  *Remediated*), evidence, comments with screenshots, the «Adjuntos» gallery and an
+  optional chat with the Provider.
+- **Spec and gates:** every requirement has an executed test case; selftests and
+  `.githooks` run them.
+- **Subagents:** recon-mapper, finding-analyzer, finding-verifier, coverage-critic,
+  exploit-developer, report-writer, code-auditor, code-reviewer, knowledge-curator,
+  content-strategist.
+- **Skills:** pentest-cycle, ai-redteam-cycle, agent-harness-audit, engagement-init,
+  toolbox-up, spec-new, tui-design.
+- **Git hooks:** no `engagements/` in git, secret scan, no AI attribution, and a change to
+  the trust boundary must touch the living spec.
 
 ## What is enforced where
 
